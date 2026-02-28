@@ -1,1 +1,1 @@
-[DATASHEET LCD](https://www.waveshare.com/wiki/1.47inch_LCD_Module)
+[DATASHEET LCD ST7789V3](https://www.waveshare.com/wiki/1.47inch_LCD_Module)
