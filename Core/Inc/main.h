@@ -61,6 +61,10 @@ void Error_Handler(void);
 #define T_VCP_RX_GPIO_Port GPIOA
 #define T_VCP_TX_Pin GPIO_PIN_4
 #define T_VCP_TX_GPIO_Port GPIOA
+#define LCD_SCK_Pin GPIO_PIN_5
+#define LCD_SCK_GPIO_Port GPIOA
+#define LCD_MOSI_Pin GPIO_PIN_7
+#define LCD_MOSI_GPIO_Port GPIOA
 #define ARD_D1_TX_Pin GPIO_PIN_14
 #define ARD_D1_TX_GPIO_Port GPIOB
 #define ARD_D0_RX_Pin GPIO_PIN_15
