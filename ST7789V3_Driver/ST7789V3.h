@@ -9,15 +9,36 @@
 #ifndef __ST7789V3_H
 #define __ST7789V3_H
 
+#include <stdint.h>
 
-#define ST7789V3_WIDTH  ?
-#define ST7789V3_HEIGHT ?
+typedef enum {
+  High = 1,
+  Low = 0,
+} GPIO_Pinstate;
 
-void ST7789V3_init();
+typedef struct {
+  // --- function pointers ---
+  int8_t (*spi_write)(uint16_t len, const uint8_t *pData);
+  int8_t (*delay)(uint32_t milliseconds);
 
+  // FOR DMA INTEGRATION TODO: LATER
+  // int8_t (*wait_for_tx_complete_DMA)();
 
+  int8_t (*set_cs)(GPIO_Pinstate state);
+  int8_t (*set_dc)(GPIO_Pinstate state);
+  int8_t (*set_rst)(GPIO_Pinstate state);
+  int8_t (*set_backlight)(GPIO_Pinstate state);
 
+  // --- LCD attributes ---
+  uint16_t LCD_Width;
+  uint16_t LCD_Height;
+  
+  // Offset memory start point based on LCD size
+  uint8_t Col_Offset;
+  uint8_t Row_Offset;  
+
+} ST7789V3_Config;
+
+void ST7789V3_init(ST7789V3_Config *config);
 
 #endif /* __ST7789V3_H */
-
-
