@@ -11,6 +11,15 @@
 
 #include <stdint.h>
 
+
+// --------- Register Maps -----------
+#define ST7789V3_rst
+#define ST7789V3_backlight 
+
+
+
+
+
 typedef enum {
   High = 1,
   Low = 0,
@@ -40,5 +49,17 @@ typedef struct {
 } ST7789V3_Config;
 
 void ST7789V3_init(ST7789V3_Config *config);
+
+int8_t WriteCmd(ST7789V3_Config *config);
+
+int8_t WriteData(ST7789V3_Config *config);
+
+int8_t SetWindow(ST7789V3_Config *config);
+
+int8_t DrawPixel(ST7789V3_Config *config);
+
+int8_t DrawChar(ST7789V3_Config *config);
+
+int8_t DrawString(ST7789V3_Config *config);
 
 #endif /* __ST7789V3_H */
