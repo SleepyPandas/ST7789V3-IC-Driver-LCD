@@ -38,6 +38,10 @@ typedef enum {
 } Color_Mode;
 
 #define Display_On_Register 0x29U
+// Column Address Set 
+#define CASET 0x2AU
+#define RASET 0x2BU
+#define RAMWR 0x2CU
 
 // DC LOW Command DC High Data
 
@@ -75,7 +79,10 @@ int8_t WriteCmd(ST7789V3_Config *config);
 
 int8_t WriteData(ST7789V3_Config *config);
 
-int8_t SetWindow(ST7789V3_Config *config);
+// Set the "bounding box" of the LCD screen
+
+int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
+                 uint16_t Y_Start, uint16_t Y_End);
 
 int8_t DrawPixel(ST7789V3_Config *config);
 

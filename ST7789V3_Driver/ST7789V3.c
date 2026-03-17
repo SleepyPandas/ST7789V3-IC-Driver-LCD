@@ -74,3 +74,44 @@ int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth) {
 void DISPLAYON(ST7789V3_Config *config) {
   ST7789V3_WriteCommand(config, Display_On_Register);
 }
+
+// Needs to know where the bounds of the lcd are
+int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
+                 uint16_t Y_Start, uint16_t Y_End) {
+
+  uint16_t X_StartOffset = X_Start + config->Col_Offset;
+  uint16_t X_EndOffset = X_End + config->Col_Offset;
+  uint16_t Y_StartOffset = Y_Start + config->Row_Offset;
+  uint16_t Y_EndOffset = Y_End + config->Row_Offset;
+
+  uint8_t High_Temp = (X_StartOffset >> 8);
+  uint8_t Low_Temp = (X_StartOffset & 0xFFU);
+  // Horizontal X , write the start write the end of X
+  ST7789V3_WriteCommand(config, CASET);
+
+  ST7789V3_WriteData(config, High_Temp);
+  ST7789V3_WriteData(config, Low_Temp);
+  High_Temp = (X_EndOffset >> 8);
+  Low_Temp = (X_EndOffset & 0xFFU);
+
+  ST7789V3_WriteData(config, High_Temp);
+  ST7789V3_WriteData(config, Low_Temp);
+
+  ST7789V3_WriteCommand(config, RASET);
+
+  High_Temp = (Y_StartOffset >> 8);
+  Low_Temp = (Y_StartOffset & 0xFFU);
+
+  ST7789V3_WriteData(config, High_Temp);
+  ST7789V3_WriteData(config, Low_Temp);
+
+  High_Temp = (Y_EndOffset >> 8);
+  Low_Temp = (Y_EndOffset & 0xFFU);
+
+  ST7789V3_WriteData(config, High_Temp);
+  ST7789V3_WriteData(config, Low_Temp);
+
+  ST7789V3_WriteCommand(config, RAMWR);
+  // Error code for wrong bounds? or exceeded bounds?
+  return 0;
+}
