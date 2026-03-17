@@ -24,10 +24,19 @@ typedef enum {
   LOW = 0,
 } GPIO_Pinstate;
 
+// Send Command or Data 
 typedef enum {
   DATA = 1,
   CMD = 0,
 } Trans_State;
+
+// Color Modes 12 bit 14, 16 etc
+typedef enum {
+  bit_12 = 0x03U,
+  bit_16 = 0x55U,
+  bit_18 = 0x66U,
+} Color_Mode;
+
 
 // DC LOW Command DC High Data
 
@@ -52,7 +61,12 @@ typedef struct {
   uint8_t Col_Offset;
   uint8_t Row_Offset;
 
+  // Color Mode Bit depth
+  Color_Mode Bit_Depth;
+
 } ST7789V3_Config;
+
+
 
 void ST7789V3_init(ST7789V3_Config *config);
 
@@ -65,5 +79,11 @@ int8_t SetWindow(ST7789V3_Config *config);
 int8_t DrawPixel(ST7789V3_Config *config);
 
 int8_t DrawChar(ST7789V3_Config *config);
+
+int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth);
+
+int8_t DISPLAYON(ST7789V3_Config *config);
+
+int8_t DISPLAYOFF(ST7789V3_Config *config);
 
 #endif /* __ST7789V3_H */

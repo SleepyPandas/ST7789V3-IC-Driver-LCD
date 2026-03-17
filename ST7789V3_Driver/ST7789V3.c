@@ -10,6 +10,8 @@
  */
 
 #include "ST7789V3.h"
+#include <stdint.h>
+#include <sys/types.h>
 
 
 // ------------ PRIVATE HELPER FUNCTIONS ------------------
@@ -40,6 +42,8 @@ void ST7789V3_init(ST7789V3_Config *config) {
 
   //
 
+  uint8_t status;
+
   config->set_rst(HIGH);
   config->delay_ms(120);
   config->set_rst(LOW);
@@ -47,6 +51,12 @@ void ST7789V3_init(ST7789V3_Config *config) {
   // SPI communication to WAKE
   ST7789V3_WriteCommand(config, Sleep_Out);
   config->delay_ms(120);
+
+  // By default set the Color mode to 16 bit
+  status = SetColorMode(config, bit_16);
+
+
+
 
   // Color Mode 16 bit TBD
 
@@ -57,4 +67,12 @@ void ST7789V3_init(ST7789V3_Config *config) {
   // Display Inversion 
 
   // Display On and Show Buffer items
+}
+
+int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth) {
+  
+  ST7789V3_WriteCommand(config, bitdepth);
+  config->Bit_Depth = bitdepth;
+
+  return 0;
 }
