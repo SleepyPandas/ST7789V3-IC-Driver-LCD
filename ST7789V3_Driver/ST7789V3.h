@@ -20,8 +20,8 @@
 #define Sleep_In 0x10U
 
 typedef enum {
-  High = 1,
-  Low = 0,
+  HIGH = 1,
+  LOW = 0,
 } GPIO_Pinstate;
 
 typedef enum {
