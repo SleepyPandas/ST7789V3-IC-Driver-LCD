@@ -17,16 +17,16 @@
 
 static void ST7789V3_WriteCommand(ST7789V3_Config *config, uint8_t cmd) {
   config->set_dc(CMD);
-  config->set_cs(Low);
+  config->set_cs(LOW);
   config->spi_write(1, &cmd);
-  config->set_cs(High);
+  config->set_cs(HIGH);
 }
 
 static void ST7789V3_WriteData(ST7789V3_Config *config, uint8_t data) {
   config->set_dc(DATA);
-  config->set_cs(Low);
+  config->set_cs(LOW);
   config->spi_write(1, &data);
-  config->set_cs(High);
+  config->set_cs(HIGH);
 }
 
 
@@ -40,9 +40,9 @@ void ST7789V3_init(ST7789V3_Config *config) {
 
   //
 
-  config->set_rst(High);
+  config->set_rst(HIGH);
   config->delay_ms(120);
-  config->set_rst(Low);
+  config->set_rst(LOW);
 
   // SPI communication to WAKE
   ST7789V3_WriteCommand(config, Sleep_Out);
