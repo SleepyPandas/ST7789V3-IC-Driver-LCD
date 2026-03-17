@@ -13,9 +13,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-
 // ------------ PRIVATE HELPER FUNCTIONS ------------------
-
 
 static void ST7789V3_WriteCommand(ST7789V3_Config *config, uint8_t cmd) {
   config->set_dc(CMD);
@@ -31,8 +29,6 @@ static void ST7789V3_WriteData(ST7789V3_Config *config, uint8_t data) {
   config->set_cs(HIGH);
 }
 
-
-
 void ST7789V3_init(ST7789V3_Config *config) {
   //   1. Hardware RST pulse GPIO only, no SPI
   //   2. Delay(~120ms after RST goes HIGH)
@@ -41,8 +37,6 @@ void ST7789V3_init(ST7789V3_Config *config) {
   //    other stuff.... for initilization Perhaps Based on users config?
 
   //
-
-  uint8_t status;
 
   config->set_rst(HIGH);
   config->delay_ms(120);
@@ -53,26 +47,30 @@ void ST7789V3_init(ST7789V3_Config *config) {
   config->delay_ms(120);
 
   // By default set the Color mode to 16 bit
-  status = SetColorMode(config, bit_16);
-
-
-
-
-  // Color Mode 16 bit TBD
+  SetColorMode(config, bit_16);
 
   // Memory Access Control
 
   // Rotation, color Order default RGB
-  
-  // Display Inversion 
+
+  // Display Inversion
 
   // Display On and Show Buffer items
+
+  DISPLAYON(config);
+
+  // Set backlight on
+  config->set_backlight(HIGH);
 }
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth) {
-  
+
   ST7789V3_WriteCommand(config, bitdepth);
   config->Bit_Depth = bitdepth;
 
   return 0;
+}
+
+void DISPLAYON(ST7789V3_Config *config) {
+  ST7789V3_WriteCommand(config, Display_On_Register);
 }

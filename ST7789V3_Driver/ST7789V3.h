@@ -37,6 +37,7 @@ typedef enum {
   bit_18 = 0x66U,
 } Color_Mode;
 
+#define Display_On_Register 0x29U
 
 // DC LOW Command DC High Data
 
@@ -82,8 +83,8 @@ int8_t DrawChar(ST7789V3_Config *config);
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth);
 
-int8_t DISPLAYON(ST7789V3_Config *config);
+void DISPLAYON(ST7789V3_Config *config);
 
-int8_t DISPLAYOFF(ST7789V3_Config *config);
+void DISPLAYOFF(ST7789V3_Config *config);
 
 #endif /* __ST7789V3_H */
