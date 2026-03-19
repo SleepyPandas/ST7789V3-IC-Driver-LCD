@@ -24,7 +24,7 @@ typedef enum {
   LOW = 0,
 } GPIO_Pinstate;
 
-// Send Command or Data 
+// Send Command or Data
 typedef enum {
   DATA = 1,
   CMD = 0,
@@ -38,7 +38,7 @@ typedef enum {
 } Color_Mode;
 
 #define Display_On_Register 0x29U
-// Column Address Set 
+// Column Address Set
 #define CASET 0x2AU
 #define RASET 0x2BU
 #define RAMWR 0x2CU
@@ -70,8 +70,6 @@ typedef struct {
   Color_Mode Bit_Depth;
 
 } ST7789V3_Config;
-
-
 
 void ST7789V3_init(ST7789V3_Config *config);
 
