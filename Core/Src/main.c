@@ -96,7 +96,7 @@ int8_t spi_write(uint16_t len, const uint8_t *pData){
 
 }
 
-int8_t delay_ms(uint32_t milliseconds) {
+void delay_ms(uint32_t milliseconds) {
   HAL_Delay(milliseconds);
 }
 
