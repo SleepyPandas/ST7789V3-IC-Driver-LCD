@@ -51,6 +51,12 @@ void ST7789V3_init(ST7789V3_Config *config) {
 
   // Memory Access Control
 
+  // configure offsets
+  
+  // Divide by 2 because Pixels are split equally between left and right sides of the lcd
+  config->Col_Offset = (240 - config->LCD_Width) / 2;  
+  config->Row_Offset = (320 - config->LCD_Height) / 2; 
+
   // Rotation, color Order default RGB
 
   // Display Inversion
