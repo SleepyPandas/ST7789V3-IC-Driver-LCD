@@ -116,6 +116,11 @@ int main(void) {
 
   /* USER CODE BEGIN 1 */
   config.set_cs = set_cs;
+  config.set_dc = set_dc;
+  config.set_rst = set_rst;
+
+  config.LCD_Width = 320;
+  config.LCD_Height = 172;
   
   /* USER CODE END 1 */
 
