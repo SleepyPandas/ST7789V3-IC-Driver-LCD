@@ -160,3 +160,16 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
 
   config->set_cs(HIGH);
 }
+
+/** 
+ * @brief Hard reset all settings to default 
+ */
+
+void HardReset(ST7789V3_Config *config) {
+  config->set_rst(HIGH);
+  config->delay_ms(10);
+  config->set_rst(LOW);
+  config->delay_ms(10);
+  config->set_rst(HIGH);
+  config->delay_ms(120);
+}

@@ -95,4 +95,6 @@ void DISPLAYON(ST7789V3_Config *config);
 
 void DISPLAYOFF(ST7789V3_Config *config);
 
+void HardReset(ST7789V3_Config *config);
+
 #endif /* __ST7789V3_H */
