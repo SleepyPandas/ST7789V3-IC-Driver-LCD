@@ -33,8 +33,8 @@ typedef enum {
 // Color Modes 12 bit 14, 16 etc
 typedef enum {
   bit_12 = 0x03U,
-  bit_16 = 0x55U,
-  bit_18 = 0x66U,
+  bit_16 = 0x05U,
+  bit_18 = 0x06U,
 } Color_Mode;
 
 #define Display_On_Register 0x29U
@@ -42,6 +42,7 @@ typedef enum {
 #define CASET 0x2AU
 #define RASET 0x2BU
 #define RAMWR 0x2CU
+#define COLMODE 0x3AU
 
 // DC LOW Command DC High Data
 

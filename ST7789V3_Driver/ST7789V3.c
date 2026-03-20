@@ -72,8 +72,8 @@ void ST7789V3_init(ST7789V3_Config *config) {
 }
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth) {
-
-  ST7789V3_WriteCommand(config, bitdepth);
+  ST7789V3_WriteCommand(config, COLMODE);
+  ST7789V3_WriteData(config, bitdepth);
   config->Bit_Depth = bitdepth;
 
   return 0;
