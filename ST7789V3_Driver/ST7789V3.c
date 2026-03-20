@@ -41,6 +41,7 @@ void ST7789V3_init(ST7789V3_Config *config) {
   config->set_rst(HIGH);
   config->delay_ms(120);
   config->set_rst(LOW);
+  config->set_rst(HIGH);
 
   // SPI communication to WAKE
   ST7789V3_WriteCommand(config, Sleep_Out);
@@ -67,7 +68,7 @@ void ST7789V3_init(ST7789V3_Config *config) {
   DISPLAYON(config);
 
   // Set backlight on
-  config->set_backlight(HIGH);
+  // config->set_backlight(HIGH);
 }
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth) {
