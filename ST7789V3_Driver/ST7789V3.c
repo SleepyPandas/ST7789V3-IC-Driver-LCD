@@ -39,9 +39,11 @@ void ST7789V3_init(ST7789V3_Config *config) {
   //
 
   config->set_rst(HIGH);
-  config->delay_ms(120);
+  config->delay_ms(10);
   config->set_rst(LOW);
+  config->delay_ms(10);
   config->set_rst(HIGH);
+  config->delay_ms(120);
 
   // SPI communication to WAKE
   ST7789V3_WriteCommand(config, Sleep_Out);
