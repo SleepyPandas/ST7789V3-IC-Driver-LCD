@@ -52,10 +52,11 @@ void ST7789V3_init(ST7789V3_Config *config) {
   // Memory Access Control
 
   // configure offsets
-  
-  // Divide by 2 because Pixels are split equally between left and right sides of the lcd
-  config->Col_Offset = (240 - config->LCD_Width) / 2;  
-  config->Row_Offset = (320 - config->LCD_Height) / 2; 
+
+  // Divide by 2 because Pixels are split equally between left and right sides
+  // of the lcd
+  config->Col_Offset = (240 - config->LCD_Width) / 2;
+  config->Row_Offset = (320 - config->LCD_Height) / 2;
 
   // Rotation, color Order default RGB
 
@@ -120,4 +121,39 @@ int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
   ST7789V3_WriteCommand(config, RAMWR);
   // Error code for wrong bounds? or exceeded bounds?
   return 0;
+}
+
+/**
+ * @brief Fill the entire LCD with a single RGB565 color. e.g
+ * take orange convert it to 5 bit 6 bit 5 bit
+ TODO: Make switch case for 12 bit 16, 18 bit
+ */
+
+void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
+  // Cover the whole display [0, Width-1] x [0, Height-1]
+  SetWindow(config, 0, config->LCD_Width - 1, 0, config->LCD_Height - 1);
+
+  uint32_t total_pixels = (config->LCD_Width) * (config->LCD_Height);
+  // take a default Hex color say 24 bit and extract it #FF FF FF white
+  uint8_t Red5 = (hexcolor >> 19) & 0x1FU;
+  uint8_t Green6 = (hexcolor >> 10) & 0x3FU;
+  uint8_t Blue5 = (hexcolor >> 3) & 0x1FU;
+  uint16_t color565 = 0;
+  color565 = (Red5 << 11) | color565;
+  color565 = (Green6 << 5) | color565;
+  color565 = Blue5 | color565;
+
+  config->set_dc(DATA);
+  config->set_cs(LOW);
+  // Write Data
+
+  uint8_t color565_High = (color565 >> 8) & 0xFFU;
+  uint8_t color565_Low = color565 & 0xFFU;
+
+  for (uint32_t i = 0; i < total_pixels; i++) {
+    config->spi_write(1, &color565_High);
+    config->spi_write(1, &color565_Low);
+  }
+
+  config->set_cs(HIGH);
 }

@@ -86,6 +86,8 @@ int8_t DrawPixel(ST7789V3_Config *config);
 
 int8_t DrawChar(ST7789V3_Config *config);
 
+void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
+
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth);
 
 void DISPLAYON(ST7789V3_Config *config);
