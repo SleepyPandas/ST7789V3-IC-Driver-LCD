@@ -96,9 +96,6 @@ int8_t spi_write(uint16_t len, const uint8_t *pData){
 
 }
 
-void delay_ms(uint32_t milliseconds) {
-  HAL_Delay(milliseconds);
-}
 
 // backlight default on
 
@@ -119,8 +116,11 @@ int main(void) {
   config.set_dc = set_dc;
   config.set_rst = set_rst;
 
-  config.LCD_Width = 320;
-  config.LCD_Height = 172;
+  config.spi_write = spi_write;
+  config.delay_ms = HAL_Delay;
+      
+  config.LCD_Width = 172;
+  config.LCD_Height = 320;
   
   /* USER CODE END 1 */
 
@@ -131,7 +131,7 @@ int main(void) {
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  ST7789V3_init(&config);
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -147,12 +147,15 @@ int main(void) {
   MX_ICACHE_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  ST7789V3_init(&config);
 
-  /* USER CODE END 2 */
+  FillScreen(&config, 0xff9900);
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1) {
+      /* USER CODE END 2 */
+
+      /* Infinite loop */
+      /* USER CODE BEGIN WHILE */
+      while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
