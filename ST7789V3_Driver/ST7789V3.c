@@ -64,6 +64,9 @@ void ST7789V3_init(ST7789V3_Config *config) {
   // Rotation, color Order default RGB
 
   // Display Inversion
+     
+
+  config->Inversion_Mode = INVOFF;
 
   // Display On and Show Buffer items
 
@@ -172,4 +175,17 @@ void HardReset(ST7789V3_Config *config) {
   config->delay_ms(10);
   config->set_rst(HIGH);
   config->delay_ms(120);
+}
+ 
+void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion) {
+  config->set_dc(CMD);
+  config->set_cs(LOW);
+
+  if (Inversion = INVON) {
+    ST7789V3_WriteCommand(config, INVON_REG);
+  } else {
+    ST7789V3_WriteCommand(config, INVOFF_REG);
+  }
+
+  config->set_cs(HIGH);
 }

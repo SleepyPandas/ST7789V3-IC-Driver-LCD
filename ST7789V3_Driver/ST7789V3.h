@@ -37,6 +37,11 @@ typedef enum {
   bit_18 = 0x06U,
 } Color_Mode;
 
+typedef enum {
+  INVON = 1,
+  INVOFF = 0, 
+}Inversion_Mode;
+
 #define Display_On_Register 0x29U
 // Column Address Set
 #define CASET 0x2AU
@@ -44,9 +49,13 @@ typedef enum {
 #define RAMWR 0x2CU
 #define COLMODE 0x3AU
 
-// DC LOW Command DC High Data
+// For inverting Displays
+#define INVOFF_REG 0x20U
+#define INVON_REG 0x21U
 
-typedef struct {
+    // DC LOW Command DC High Data
+
+    typedef struct {
   // --- function pointers ---
   int8_t (*spi_write)(uint16_t len, const uint8_t *pData);
   void (*delay_ms)(uint32_t milliseconds);
@@ -69,6 +78,9 @@ typedef struct {
 
   // Color Mode Bit depth
   Color_Mode Bit_Depth;
+
+  //Display Inversion State
+  Inversion_Mode Inversion_Mode;
 
 } ST7789V3_Config;
 
@@ -96,5 +108,7 @@ void DISPLAYON(ST7789V3_Config *config);
 void DISPLAYOFF(ST7789V3_Config *config);
 
 void HardReset(ST7789V3_Config *config);
+
+void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion);
 
 #endif /* __ST7789V3_H */
