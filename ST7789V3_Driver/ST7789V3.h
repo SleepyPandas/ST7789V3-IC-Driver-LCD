@@ -86,10 +86,6 @@ typedef enum {
 
 void ST7789V3_init(ST7789V3_Config *config);
 
-int8_t WriteCmd(ST7789V3_Config *config);
-
-int8_t WriteData(ST7789V3_Config *config);
-
 // Set the "bounding box" of the LCD screen
 
 int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,

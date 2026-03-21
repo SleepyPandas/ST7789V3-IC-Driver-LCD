@@ -15,14 +15,14 @@
 
 // ------------ PRIVATE HELPER FUNCTIONS ------------------
 
-static void ST7789V3_WriteCommand(ST7789V3_Config *config, uint8_t cmd) {
+static void WriteCommand(ST7789V3_Config *config, uint8_t cmd) {
   config->set_dc(CMD);
   config->set_cs(LOW);
   config->spi_write(1, &cmd);
   config->set_cs(HIGH);
 }
 
-static void ST7789V3_WriteData(ST7789V3_Config *config, uint8_t data) {
+static void WriteData(ST7789V3_Config *config, uint8_t data) {
   config->set_dc(DATA);
   config->set_cs(LOW);
   config->spi_write(1, &data);
@@ -46,7 +46,7 @@ void ST7789V3_init(ST7789V3_Config *config) {
   config->delay_ms(120);
 
   // SPI communication to WAKE
-  ST7789V3_WriteCommand(config, Sleep_Out);
+  WriteCommand(config, Sleep_Out);
   config->delay_ms(120);
 
   // By default set the Color mode to 16 bit
@@ -64,7 +64,6 @@ void ST7789V3_init(ST7789V3_Config *config) {
   // Rotation, color Order default RGB
 
   // Display Inversion
-     
 
   config->Inversion_Mode = INVOFF;
 
@@ -77,15 +76,15 @@ void ST7789V3_init(ST7789V3_Config *config) {
 }
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth) {
-  ST7789V3_WriteCommand(config, COLMODE);
-  ST7789V3_WriteData(config, bitdepth);
+  WriteCommand(config, COLMODE);
+  WriteData(config, bitdepth);
   config->Bit_Depth = bitdepth;
 
   return 0;
 }
 
 void DISPLAYON(ST7789V3_Config *config) {
-  ST7789V3_WriteCommand(config, Display_On_Register);
+  WriteCommand(config, Display_On_Register);
 }
 
 // Needs to know where the bounds of the lcd are
@@ -100,31 +99,31 @@ int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
   uint8_t High_Temp = (X_StartOffset >> 8);
   uint8_t Low_Temp = (X_StartOffset & 0xFFU);
   // Horizontal X , write the start write the end of X
-  ST7789V3_WriteCommand(config, CASET);
+  WriteCommand(config, CASET);
 
-  ST7789V3_WriteData(config, High_Temp);
-  ST7789V3_WriteData(config, Low_Temp);
+  WriteData(config, High_Temp);
+  WriteData(config, Low_Temp);
   High_Temp = (X_EndOffset >> 8);
   Low_Temp = (X_EndOffset & 0xFFU);
 
-  ST7789V3_WriteData(config, High_Temp);
-  ST7789V3_WriteData(config, Low_Temp);
+  WriteData(config, High_Temp);
+  WriteData(config, Low_Temp);
 
-  ST7789V3_WriteCommand(config, RASET);
+  WriteCommand(config, RASET);
 
   High_Temp = (Y_StartOffset >> 8);
   Low_Temp = (Y_StartOffset & 0xFFU);
 
-  ST7789V3_WriteData(config, High_Temp);
-  ST7789V3_WriteData(config, Low_Temp);
+  WriteData(config, High_Temp);
+  WriteData(config, Low_Temp);
 
   High_Temp = (Y_EndOffset >> 8);
   Low_Temp = (Y_EndOffset & 0xFFU);
 
-  ST7789V3_WriteData(config, High_Temp);
-  ST7789V3_WriteData(config, Low_Temp);
+  WriteData(config, High_Temp);
+  WriteData(config, Low_Temp);
 
-  ST7789V3_WriteCommand(config, RAMWR);
+  WriteCommand(config, RAMWR);
   // Error code for wrong bounds? or exceeded bounds?
   return 0;
 }
@@ -164,8 +163,8 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
   config->set_cs(HIGH);
 }
 
-/** 
- * @brief Hard reset all settings to default 
+/**
+ * @brief Hard reset all settings to default
  */
 
 void HardReset(ST7789V3_Config *config) {
@@ -176,15 +175,15 @@ void HardReset(ST7789V3_Config *config) {
   config->set_rst(HIGH);
   config->delay_ms(120);
 }
- 
+
 void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion) {
   config->set_dc(CMD);
   config->set_cs(LOW);
 
   if (Inversion == INVON) {
-    ST7789V3_WriteCommand(config, INVON_REG);
+    WriteCommand(config, INVON_REG);
   } else {
-    ST7789V3_WriteCommand(config, INVOFF_REG);
+    WriteCommand(config, INVOFF_REG);
   }
 
   config->set_cs(HIGH);
