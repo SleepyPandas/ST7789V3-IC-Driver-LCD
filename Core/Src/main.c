@@ -149,13 +149,15 @@ int main(void) {
   /* USER CODE BEGIN 2 */
   ST7789V3_init(&config);
 
+  InvertDisplay(&config, INVOFF);
+
   FillScreen(&config, 0xff9900);
 
-      /* USER CODE END 2 */
+  /* USER CODE END 2 */
 
-      /* Infinite loop */
-      /* USER CODE BEGIN WHILE */
-      while (1) {
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
