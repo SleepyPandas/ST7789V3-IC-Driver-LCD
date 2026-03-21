@@ -181,7 +181,7 @@ void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion) {
   config->set_dc(CMD);
   config->set_cs(LOW);
 
-  if (Inversion = INVON) {
+  if (Inversion == INVON) {
     ST7789V3_WriteCommand(config, INVON_REG);
   } else {
     ST7789V3_WriteCommand(config, INVOFF_REG);
