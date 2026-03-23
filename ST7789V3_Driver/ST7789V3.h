@@ -42,6 +42,11 @@ typedef enum {
   INVOFF = 0, 
 }Inversion_Mode;
 
+typedef enum {
+  Asleep = 0,
+  Awake = 1,
+}Sleep_State;
+
 #define Display_On_Register 0x29U
 // Column Address Set
 #define CASET 0x2AU
@@ -91,11 +96,6 @@ void ST7789V3_init(ST7789V3_Config *config);
 int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
                  uint16_t Y_Start, uint16_t Y_End);
 
-int8_t DrawPixel(ST7789V3_Config *config);
-
-int8_t DrawChar(ST7789V3_Config *config);
-
-void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth);
 
@@ -106,5 +106,23 @@ void DISPLAYOFF(ST7789V3_Config *config);
 void HardReset(ST7789V3_Config *config);
 
 void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion);
+
+void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate);
+
+// Define UX experience functions for user;
+
+int8_t DrawPixel(ST7789V3_Config *config);
+
+int8_t DrawChar(ST7789V3_Config *config);
+
+void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
+
+void SetRotation(ST7789V3_Config *config, uint16_t orientation);
+
+void DrawImage(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t w,
+               uint16_t h, const uint16_t *image_data);
+
+// To be inplemented but will USE DMA 
+void WriteDataBuffer(ST7789V3_Config *config);
 
 #endif /* __ST7789V3_H */
