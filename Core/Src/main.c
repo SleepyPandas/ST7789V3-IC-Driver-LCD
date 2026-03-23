@@ -153,6 +153,8 @@ int main(void) {
 
   FillScreen(&config, 0xff9900);
 
+  InvertDisplay(&config, INVON);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
