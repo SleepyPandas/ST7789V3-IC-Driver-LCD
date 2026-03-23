@@ -19,6 +19,33 @@
 #define Sleep_Out 0x11U
 #define Sleep_In 0x10U
 
+// --------- RGB888 Color Definitions (24-bit) -----------
+// Format 24 bit: 0xRRGGBB to be Converted
+
+#define COLOR_BLACK 0x000000U
+#define COLOR_WHITE 0xFFFFFFU
+#define COLOR_RED 0xFF0000U
+#define COLOR_GREEN 0x00FF00U
+#define COLOR_BLUE 0x0000FFU
+#define COLOR_YELLOW 0xFFFF00U
+#define COLOR_CYAN 0x00FFFFU
+#define COLOR_MAGENTA 0xFF00FFU
+#define COLOR_ORANGE 0xFF6A00U
+#define COLOR_PINK 0xFF69B4U
+#define COLOR_PURPLE 0x800080U
+#define COLOR_LIME 0x32FF00U
+#define COLOR_NAVY 0x000080U
+#define COLOR_DARK_GREEN 0x006400U
+#define COLOR_MAROON 0x800000U
+#define COLOR_OLIVE 0x808000U
+#define COLOR_TEAL 0x008080U
+#define COLOR_SILVER 0xC0C0C0U
+#define COLOR_GRAY 0x808080U
+#define COLOR_DARK_GRAY 0x404040U
+#define COLOR_LIGHT_GRAY 0xD3D3D3U
+#define COLOR_GOLD 0xFFD700U
+#define COLOR_SKY_BLUE 0x87CEEBU
+
 typedef enum {
   HIGH = 1,
   LOW = 0,
@@ -39,13 +66,13 @@ typedef enum {
 
 typedef enum {
   INVON = 1,
-  INVOFF = 0, 
-}Inversion_Mode;
+  INVOFF = 0,
+} Inversion_Mode;
 
 typedef enum {
   Asleep = 0,
   Awake = 1,
-}Sleep_State;
+} Sleep_State;
 
 #define Display_On_Register 0x29U
 #define Display_Off_Register 0x28U
@@ -60,9 +87,9 @@ typedef enum {
 #define INVOFF_REG 0x20U
 #define INVON_REG 0x21U
 
-    // DC LOW Command DC High Data
+// DC LOW Command DC High Data
 
-    typedef struct {
+typedef struct {
   // --- function pointers ---
   int8_t (*spi_write)(uint16_t len, const uint8_t *pData);
   void (*delay_ms)(uint32_t milliseconds);
