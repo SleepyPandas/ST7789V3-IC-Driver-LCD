@@ -92,6 +92,9 @@ void DISPLAYOFF(ST7789V3_Config *config) {
   WriteCommand(config, Display_Off_Register);
 }
 
+/**
+ * @brief Hard reset all settings to default
+ */
 void HardReset(ST7789V3_Config *config) {
   config->set_rst(HIGH);
   config->delay_ms(10);
@@ -157,16 +160,23 @@ int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
   return 0;
 }
 
+void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate) {
+  if (sleepstate == 0) {
+    WriteCommand(config, Sleep_Out);
+  } else {
+    WriteCommand(config, Sleep_In);
+  }
+}
 
-// =============== Graphical Functions ================
+    // =============== Graphical Functions ================
 
-/**
- * @brief Fill the entire LCD with a single RGB565 color. e.g
- * take orange convert it to 5 bit 6 bit 5 bit
- TODO: Make switch case for 12 bit 16, 18 bit
- */
+    /**
+     * @brief Fill the entire LCD with a single RGB565 color. e.g
+     * take orange convert it to 5 bit 6 bit 5 bit
+     TODO: Make switch case for 12 bit 16, 18 bit
+     */
 
-void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
+    void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
   // Cover the whole display [0, Width-1] x [0, Height-1]
   SetWindow(config, 0, config->LCD_Width - 1, 0, config->LCD_Height - 1);
 
@@ -194,12 +204,3 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
 
   config->set_cs(HIGH);
 }
-
-/**
- * @brief Hard reset all settings to default
- */
-
-
-
-
-
