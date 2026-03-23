@@ -92,6 +92,30 @@ void DISPLAYOFF(ST7789V3_Config *config) {
   WriteCommand(config, Display_Off_Register);
 }
 
+void HardReset(ST7789V3_Config *config) {
+  config->set_rst(HIGH);
+  config->delay_ms(10);
+  config->set_rst(LOW);
+  config->delay_ms(10);
+  config->set_rst(HIGH);
+  config->delay_ms(120);
+}
+
+void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion) {
+  // config->set_dc(CMD);
+  // config->set_cs(LOW);
+
+  if (Inversion == INVON) {
+    WriteCommand(config, INVON_REG);
+  } else {
+    WriteCommand(config, INVOFF_REG);
+  }
+
+  config->Inversion_Mode = Inversion;
+
+  // config->set_cs(HIGH);
+}
+
 // Needs to know where the bounds of the lcd are
 int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
                  uint16_t Y_Start, uint16_t Y_End) {
@@ -133,6 +157,9 @@ int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
   return 0;
 }
 
+
+// =============== Graphical Functions ================
+
 /**
  * @brief Fill the entire LCD with a single RGB565 color. e.g
  * take orange convert it to 5 bit 6 bit 5 bit
@@ -172,26 +199,7 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
  * @brief Hard reset all settings to default
  */
 
-void HardReset(ST7789V3_Config *config) {
-  config->set_rst(HIGH);
-  config->delay_ms(10);
-  config->set_rst(LOW);
-  config->delay_ms(10);
-  config->set_rst(HIGH);
-  config->delay_ms(120);
-}
 
-void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion) {
-  // config->set_dc(CMD);
-  // config->set_cs(LOW);
 
-  if (Inversion == INVON) {
-    WriteCommand(config, INVON_REG);
-  } else {
-    WriteCommand(config, INVOFF_REG);
-  }
 
-  config->Inversion_Mode = Inversion;
 
-  // config->set_cs(HIGH);
-}
