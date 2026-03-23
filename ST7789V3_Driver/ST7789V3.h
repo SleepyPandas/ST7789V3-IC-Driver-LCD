@@ -109,14 +109,13 @@ void HardReset(ST7789V3_Config *config);
 
 void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion);
 
-/** TODO: implement */ 
 void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate);
 
-// Define UX experience functions for user;
+// =============== Graphical Functions ================
 /** TODO: implement */
-int8_t DrawPixel(ST7789V3_Config *config);
+void DrawPixel(ST7789V3_Config *config);
 /** TODO: implement */
-int8_t DrawChar(ST7789V3_Config *config);
+void DrawChar(ST7789V3_Config *config);
 
 void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
 /** TODO: implement */
