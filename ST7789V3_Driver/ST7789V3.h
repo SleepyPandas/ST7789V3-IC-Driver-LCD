@@ -125,4 +125,7 @@ void DrawImage(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t w,
 // To be inplemented but will USE DMA 
 void WriteDataBuffer(ST7789V3_Config *config);
 
+void LCD_DrawImageDMA(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                      const uint16_t *image_data);
+
 #endif /* __ST7789V3_H */
