@@ -48,6 +48,8 @@ typedef enum {
 }Sleep_State;
 
 #define Display_On_Register 0x29U
+#define Display_Off_Register 0x28U
+
 // Column Address Set
 #define CASET 0x2AU
 #define RASET 0x2BU

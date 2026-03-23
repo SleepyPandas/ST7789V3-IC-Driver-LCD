@@ -88,6 +88,10 @@ void DISPLAYON(ST7789V3_Config *config) {
   WriteCommand(config, Display_On_Register);
 }
 
+void DISPLAYOFF(ST7789V3_Config *config) {
+  WriteCommand(config, Display_Off_Register);
+}
+
 // Needs to know where the bounds of the lcd are
 int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
                  uint16_t Y_Start, uint16_t Y_End) {
