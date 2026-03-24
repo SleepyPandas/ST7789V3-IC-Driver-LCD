@@ -139,8 +139,14 @@ void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion);
 void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate);
 
 // =============== Graphical Functions ================
-/** TODO: implement */
-void DrawPixel(ST7789V3_Config *config);
+/** 
+* @brief Draws a colored pixel at x,y position dates in 24bit Hex Color 0xRRGGBB
+* @param config, x, y, hexcolor 
+*/
+
+int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                 uint32_t hexcolor);
+
 /** TODO: implement */
 void DrawChar(ST7789V3_Config *config);
 
@@ -156,5 +162,7 @@ void WriteDataBuffer(ST7789V3_Config *config);
 /** TODO: implement */
 void LCD_DrawImageDMA(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
                       const uint16_t *image_data);
+
+                  
 
 #endif /* __ST7789V3_H */

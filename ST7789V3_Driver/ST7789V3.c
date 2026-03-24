@@ -168,15 +168,15 @@ void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate) {
   }
 }
 
-    // =============== Graphical Functions ================
+// =============== Graphical Functions ================
 
-    /**
-     * @brief Fill the entire LCD with a single RGB565 color. e.g
-     * take orange convert it to 5 bit 6 bit 5 bit
-     TODO: Make switch case for 12 bit 16, 18 bit
-     */
+/**
+ * @brief Fill the entire LCD with a single RGB565 color. e.g
+ * take orange convert it to 5 bit 6 bit 5 bit
+ TODO: Make switch case for 12 bit 16, 18 bit
+ */
 
-    void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
+void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
   // Cover the whole display [0, Width-1] x [0, Height-1]
   SetWindow(config, 0, config->LCD_Width - 1, 0, config->LCD_Height - 1);
 
@@ -202,5 +202,30 @@ void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate) {
     config->spi_write(1, &color565_Low);
   }
 
+  config->set_cs(HIGH);
+}
+
+int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
+               uint32_t hexcolor) {
+  // Bounds check — don't draw outside the display
+  if (x >= config->LCD_Width || y >= config->LCD_Height) {
+    return -1;
+  }
+
+  // 1. Set the window to exactly this 1×1 pixel (SetWindow ends with RAMWR)
+  SetWindow(config, x, x, y, y);
+
+  uint8_t Red5 = (hexcolor >> 19) & 0x1FU;
+  uint8_t Green6 = (hexcolor >> 10) & 0x3FU;
+  uint8_t Blue5 = (hexcolor >> 3) & 0x1FU;
+  uint16_t color565 = (Red5 << 11) | (Green6 << 5) | Blue5;
+
+  uint8_t color565_High = (color565 >> 8) & 0xFFU;
+  uint8_t color565_Low = color565 & 0xFFU;
+
+  config->set_dc(DATA);
+  config->set_cs(LOW);
+  config->spi_write(1, &color565_High);
+  config->spi_write(1, &color565_Low);
   config->set_cs(HIGH);
 }
