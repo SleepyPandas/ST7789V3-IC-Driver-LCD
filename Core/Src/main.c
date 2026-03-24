@@ -155,6 +155,12 @@ int main(void) {
 
   InvertDisplay(&config, INVON);
 
+  for (uint16_t i = 40; i < 86; i++) {
+    DrawPixel(&config, i, 160, COLOR_LIME);
+  }
+
+  DrawPixel(&config, 86, 160, COLOR_GRAY);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
