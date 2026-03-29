@@ -76,6 +76,13 @@ typedef enum {
   Awake = 1,
 } Sleep_State;
 
+typedef enum {
+  Portrait = 0,
+  Landscape = 1,
+  Portrait_Inverted = 2,
+  Landscape_Inverted = 3,
+} Orientation;
+
 #define Display_On_Register 0x29U
 #define Display_Off_Register 0x28U
 
@@ -84,6 +91,7 @@ typedef enum {
 #define RASET 0x2BU
 #define RAMWR 0x2CU
 #define COLMODE 0x3AU
+#define MADCTL 0x36U
 
 // For inverting Displays
 #define INVOFF_REG 0x20U
@@ -154,9 +162,16 @@ void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
               uint32_t hexcolor, const FontDef *font);
 
 void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
+
+
+/** 
+* @brief Sets the rotation of the display
+* @param config, orientation 
+*/
+
+void SetRotation(ST7789V3_Config *config, Orientation orientation);
+// To be inplemented but will USE DMA  
 /** TODO: implement */
-void SetRotation(ST7789V3_Config *config, uint16_t orientation);
-// To be inplemented but will USE DMA  /** TODO: implement */
 void WriteDataBuffer(ST7789V3_Config *config);
 /** TODO: implement */
 void LCD_DrawImageDMA(uint16_t x, uint16_t y, uint16_t w, uint16_t h,

@@ -230,7 +230,7 @@ int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
   config->set_cs(HIGH);
 
   return 0;
-  
+
 }
 
 
@@ -263,4 +263,48 @@ void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
       }
     }
   }
+}
+
+void SetRotation(ST7789V3_Config *config, Orientation orientation) {
+  uint8_t madctl_value = 0;
+
+  // The ST7789V3 supports 4 standard rotations: 0, 90, 180, 270 degrees but we use a typedef enum because I am not going to remember the values
+  switch (orientation) {
+    case Portrait: // 0 Degrees (Portrait)
+      madctl_value = 0x00;
+      config->LCD_Width = 172;
+      config->LCD_Height = 320;
+      break;
+    case Landscape: // 90 Degrees (Landscape)
+      madctl_value = 0x60; // MV = 1, MX = 1
+      config->LCD_Width = 320;
+      config->LCD_Height = 172;
+      break;
+    case Portrait_Inverted: // 180 Degrees (Portrait Inverted)
+      madctl_value = 0xC0; // MY = 1, MX = 1
+      config->LCD_Width = 172;
+      config->LCD_Height = 320;
+      break;
+    case Landscape_Inverted: // 270 Degrees (Landscape Inverted)
+      madctl_value = 0xA0; // MY = 1, MV = 1
+      config->LCD_Width = 320;
+      config->LCD_Height = 172;
+      break;
+  }
+
+  // Update offsets based on the MV bit (bit 5).
+  // When MV=1, X and Y axes are swapped in hardware.
+  if (madctl_value & 0x20) {
+    // Landscape Mode (Hardware axes swapped, Physical Max: 320x240)
+    config->Col_Offset = (320 - config->LCD_Width) / 2;
+    config->Row_Offset = (240 - config->LCD_Height) / 2;
+  } else {
+    // Portrait Mode (Normal axes, Physical Max: 240x320)
+    config->Col_Offset = (240 - config->LCD_Width) / 2;
+    config->Row_Offset = (320 - config->LCD_Height) / 2;
+  }
+
+  // Send Memory Data Access Control (MADCTL) Command
+  WriteCommand(config, MADCTL);
+  WriteData(config, madctl_value);
 }

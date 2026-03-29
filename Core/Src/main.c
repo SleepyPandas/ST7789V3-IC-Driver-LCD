@@ -160,6 +160,7 @@ int main(void) {
 
   DrawPixel(&config, 86, 160, COLOR_GRAY);
 
+  SetRotation(&config, Landscape);
 
   DrawChar(&config, 50, 70, 'C', COLOR_CYAN, &Font_16x16);
   DrawChar(&config, 50, 100, '5', COLOR_CYAN, &Font_24x32);
