@@ -46,6 +46,12 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/ST7789V3.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_8x8.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_8x16.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_16x16.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_16x24.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_16x32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_24x32.c
 )
 
 # Add include paths
