@@ -23,7 +23,9 @@
 #include "stm32h5xx_hal_def.h"
 #include "stm32h5xx_hal_gpio.h"
 #include "stm32h5xx_hal_spi.h"
+#include <fonts/fonts.h>
 #include <stdint.h>
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -70,7 +72,6 @@ static void MX_SPI1_Init(void);
 
 ST7789V3_Config config;
 
-
 int8_t set_cs(GPIO_Pinstate state) {
   HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, state);
   return 0;
@@ -85,7 +86,7 @@ int8_t set_rst(GPIO_Pinstate state) {
   return 0;
 }
 
-int8_t spi_write(uint16_t len, const uint8_t *pData){
+int8_t spi_write(uint16_t len, const uint8_t *pData) {
   uint8_t status = HAL_SPI_Transmit(&hspi1, pData, len, HAL_MAX_DELAY);
 
   if (status != HAL_OK) {
@@ -93,9 +94,7 @@ int8_t spi_write(uint16_t len, const uint8_t *pData){
   }
 
   return 0;
-
 }
-
 
 // backlight default on
 
@@ -118,10 +117,10 @@ int main(void) {
 
   config.spi_write = spi_write;
   config.delay_ms = HAL_Delay;
-      
+
   config.LCD_Width = 172;
   config.LCD_Height = 320;
-  
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -155,11 +154,17 @@ int main(void) {
 
   InvertDisplay(&config, INVON);
 
-  for (uint16_t i = 40; i < 86; i++) {
-    DrawPixel(&config, i, 160, COLOR_LIME);
-  }
+  // for (uint16_t i = 40; i < 86; i++) {
+  //   DrawPixel(&config, i, 160, COLOR_LIME);
+  // }
 
   DrawPixel(&config, 86, 160, COLOR_GRAY);
+
+
+  DrawChar(&config, 50, 70, 'C', COLOR_CYAN, &Font_16x16);
+  DrawChar(&config, 50, 100, '5', COLOR_CYAN, &Font_24x32);
+  DrawChar(&config, 50, 180, '9', COLOR_CYAN, &Font_48x48);
+
 
   /* USER CODE END 2 */
 
