@@ -156,10 +156,6 @@ void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
 void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
 /** TODO: implement */
 void SetRotation(ST7789V3_Config *config, uint16_t orientation);
-/** TODO: implement */
-void DrawImage(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t w,
-               uint16_t h, const uint16_t *image_data);
-
 // To be inplemented but will USE DMA  /** TODO: implement */
 void WriteDataBuffer(ST7789V3_Config *config);
 /** TODO: implement */
