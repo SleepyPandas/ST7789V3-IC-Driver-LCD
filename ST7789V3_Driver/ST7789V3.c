@@ -228,7 +228,11 @@ int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
   config->spi_write(1, &color565_High);
   config->spi_write(1, &color565_Low);
   config->set_cs(HIGH);
+
+  return 0;
+  
 }
+
 
 void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
               uint32_t hexcolor, const FontDef *font) {
