@@ -16,5 +16,9 @@ typedef struct {
 
 extern const FontDef Font_8x8;  
 extern const FontDef Font_8x16;
+extern const FontDef Font_16x16;
+extern const FontDef Font_16x24;
+extern const FontDef Font_16x32;
+extern const FontDef Font_24x32;
 
 #endif /* FONTS_H */
