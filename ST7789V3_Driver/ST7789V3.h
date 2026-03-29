@@ -10,6 +10,7 @@
 #define __ST7789V3_H
 
 #include <stdint.h>
+#include <sys/_intsup.h>
 
 // --------- Register Maps -----------
 #define ST7789V3_rst
@@ -148,7 +149,8 @@ int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
                  uint32_t hexcolor);
 
 /** TODO: implement */
-void DrawChar(ST7789V3_Config *config);
+void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
+              uint32_t hexcolor, const FontDef *font);
 
 void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
 /** TODO: implement */
