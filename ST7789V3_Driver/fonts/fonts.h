@@ -20,5 +20,8 @@ extern const FontDef Font_16x16;
 extern const FontDef Font_16x24;
 extern const FontDef Font_16x32;
 extern const FontDef Font_24x32;
+extern const FontDef Font_32x32;
+extern const FontDef Font_48x48;
+extern const FontDef Font_64x64;
 
 #endif /* FONTS_H */

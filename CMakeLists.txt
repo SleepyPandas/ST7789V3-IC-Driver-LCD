@@ -52,6 +52,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_16x24.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_16x32.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_24x32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_32x32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_48x48.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ST7789V3_Driver/fonts/font_64x64.c
 )
 
 # Add include paths
