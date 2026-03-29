@@ -206,7 +206,7 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
 }
 
 int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
-               uint32_t hexcolor) {
+                 uint32_t hexcolor) {
   // Bounds check — don't draw outside the display
   if (x >= config->LCD_Width || y >= config->LCD_Height) {
     return -1;
@@ -228,4 +228,35 @@ int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
   config->spi_write(1, &color565_High);
   config->spi_write(1, &color565_Low);
   config->set_cs(HIGH);
+}
+
+void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
+              uint32_t hexcolor, const FontDef *font) {
+  // Check if character is within valid printable ASCII range (32 to 126)
+  if (user_char < ' ' || user_char > '~') {
+    return;
+  }
+
+  // Calculate starting index of character in the font data array
+  uint32_t char_offset = (user_char - ' ') * font->height * font->bytes_per_row;
+
+  // Iterate over each pixel row of the character
+  for (uint8_t row = 0; row < font->height; row++) {
+    // Iterate over each pixel column
+    for (uint8_t col = 0; col < font->width; col++) {
+      // Group bits by the byte they reside in (8 bits per byte)
+      uint8_t byte_index = col / 8;
+      // The bit position within that specific byte
+      uint8_t bit_index = col % 8;
+
+      // Extract the row data for this specific row and byte column
+      uint8_t line_data = font->data[char_offset + (row * font->bytes_per_row) + byte_index];
+
+      // Font arrays store pixels horizontally MSB -> LSB
+      if (line_data & (1 << (7 - bit_index))) {
+        // Pixel is foreground, draw it
+        DrawPixel(config, x + col, y + row, hexcolor);
+      }
+    }
+  }
 }
