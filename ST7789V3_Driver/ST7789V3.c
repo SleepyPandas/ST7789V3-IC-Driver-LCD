@@ -6,7 +6,7 @@
  * @brief
  *               This file will contain the main logic for using the ST7789V3
  * chips
- *
+ * @author Anthony / SleepPandas
  */
 
 #include "ST7789V3.h"
@@ -307,4 +307,34 @@ void SetRotation(ST7789V3_Config *config, Orientation orientation) {
   // Send Memory Data Access Control (MADCTL) Command
   WriteCommand(config, MADCTL);
   WriteData(config, madctl_value);
+}
+
+void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str,
+                uint32_t hexcolor, const FontDef *font) {
+  uint16_t start_x = x;
+  // until null terminator
+  while (*str) {
+
+    if (*str == '\n') {
+      // Handle newline explicitly: go to next line and reset X
+      y += font->height;
+      x = start_x;
+
+    } else if (*str == '\r') {
+      // Carriage return just resets X
+      x = start_x;
+
+    } else {
+
+      // Line wrap if the next character exceeds LCD width
+      if (x + font->width > config->LCD_Width) {
+        y += font->height;
+        x = start_x;
+      }
+
+      DrawChar(config, x, y, *str, hexcolor, font);
+      x += font->width;
+    }
+    str++;
+  }
 }
