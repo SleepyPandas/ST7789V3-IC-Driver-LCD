@@ -341,7 +341,40 @@ void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str
 
 // =============== Shape Drawing Functions ================
 
+/**
+ * @brief Helper to draw a horizontal line efficiently using
+ * More efficient than calling DrawPixel in a loop or Drawline
+ */
 
+static void DrawHLine(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                      uint16_t length, uint32_t hexcolor) {
+  if (y >= config->LCD_Height || x >= config->LCD_Width)
+    return;
+
+  // Clamp length to display boundary (trim any overflow)
+  if (x + length > config->LCD_Width) {
+    length = config->LCD_Width - x;
+  }
+
+  SetWindow(config, x, x + length - 1, y, y);
+
+  // Convert to RGB565
+  uint8_t Red5 = (hexcolor >> 19) & 0x1FU;
+  uint8_t Green6 = (hexcolor >> 10) & 0x3FU;
+  uint8_t Blue5 = (hexcolor >> 3) & 0x1FU;
+  uint16_t color565 = (Red5 << 11) | (Green6 << 5) | Blue5;
+
+  uint8_t color565_High = (color565 >> 8) & 0xFFU;
+  uint8_t color565_Low = color565 & 0xFFU;
+
+  config->set_dc(DATA);
+  config->set_cs(LOW);
+  for (uint16_t i = 0; i < length; i++) {
+    config->spi_write(1, &color565_High);
+    config->spi_write(1, &color565_Low);
+  }
+  config->set_cs(HIGH);
+}
 
 void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0,
               uint16_t x1, uint16_t y1, uint32_t hexcolor) {
@@ -376,4 +409,9 @@ void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0,
       cy  += sy;
     }
   }
+}
+
+void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                   uint16_t width, uint16_t height, uint32_t hexcolor) {
+  
 }
