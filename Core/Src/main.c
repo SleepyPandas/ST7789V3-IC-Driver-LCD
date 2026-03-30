@@ -163,9 +163,11 @@ int main(void) {
   SetRotation(&config, Landscape);
 
   DrawChar(&config, 50, 70, 'C', COLOR_CYAN, &Font_16x16);
-  DrawChar(&config, 50, 100, '5', COLOR_CYAN, &Font_24x32);
+  DrawChar(&config, 50, 20, '5', COLOR_CYAN, &Font_24x32);
   DrawChar(&config, 50, 180, '9', COLOR_CYAN, &Font_48x48);
 
+  DrawString(&config, 50, 100, "Hello World\nThis is a test", COLOR_CYAN,
+             &Font_16x16);
 
   /* USER CODE END 2 */
 
