@@ -9,9 +9,10 @@
 #ifndef __ST7789V3_H
 #define __ST7789V3_H
 
+#include <fonts/fonts.h>
 #include <stdint.h>
 #include <sys/_intsup.h>
-#include <fonts/fonts.h>
+
 
 // --------- Register Maps -----------
 #define ST7789V3_rst
@@ -123,7 +124,7 @@ typedef struct {
   // Color Mode Bit depth
   Color_Mode Bit_Depth;
 
-  //Display Inversion State
+  // Display Inversion State
   Inversion_Mode Inversion_Mode;
 
 } ST7789V3_Config;
@@ -134,7 +135,6 @@ void ST7789V3_init(ST7789V3_Config *config);
 
 int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
                  uint16_t Y_Start, uint16_t Y_End);
-
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth);
 
@@ -149,34 +149,28 @@ void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion);
 void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate);
 
 // =============== Graphical Functions ================
-/** 
-* @brief Draws a colored pixel at x,y position dates in 24bit Hex Color 0xRRGGBB
-* @param config, x, y, hexcolor 
-*/
+/**
+ * @brief Draws a colored pixel at x,y position dates in 24bit Hex Color
+ * 0xRRGGBB
+ * @param config, x, y, hexcolor
+ */
 
 int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
                  uint32_t hexcolor);
-
 
 void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
               uint32_t hexcolor, const FontDef *font);
 
 void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
 
-
-/** 
-* @brief Sets the rotation of the display
-* @param config, orientation 
-*/
+/**
+ * @brief Sets the rotation of the display
+ * @param config, orientation
+ */
 
 void SetRotation(ST7789V3_Config *config, Orientation orientation);
-// To be inplemented but will USE DMA  
+// To be inplemented but will USE DMA
 /** TODO: implement */
 void WriteDataBuffer(ST7789V3_Config *config);
-/** TODO: implement */
-void LCD_DrawImageDMA(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
-                      const uint16_t *image_data);
-
-                  
 
 #endif /* __ST7789V3_H */
