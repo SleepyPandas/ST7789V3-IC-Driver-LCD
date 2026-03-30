@@ -171,6 +171,22 @@ void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate) {
 // =============== Graphical Functions ================
 
 /**
+ * @brief Helper to draw a horizontal line efficiently using
+ * More efficient than calling DrawPixel in a loop or Drawline
+ */
+
+static uint16_t ConvertRGB888toRGB565(uint32_t hexcolor) {
+  uint8_t Red5 = (hexcolor >> 19) & 0x1FU;
+  uint8_t Green6 = (hexcolor >> 10) & 0x3FU;
+  uint8_t Blue5 = (hexcolor >> 3) & 0x1FU;
+  uint16_t color565 = (Red5 << 11) | (Green6 << 5) | Blue5;
+  return color565;
+}
+
+
+
+
+/**
  * @brief Fill the entire LCD with a single RGB565 color. e.g
  * take orange convert it to 5 bit 6 bit 5 bit
  TODO: Make switch case for 12 bit 16, 18 bit
@@ -182,13 +198,7 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
 
   uint32_t total_pixels = (config->LCD_Width) * (config->LCD_Height);
   // take a default Hex color say 24 bit and extract it #FF FF FF white
-  uint8_t Red5 = (hexcolor >> 19) & 0x1FU;
-  uint8_t Green6 = (hexcolor >> 10) & 0x3FU;
-  uint8_t Blue5 = (hexcolor >> 3) & 0x1FU;
-  uint16_t color565 = 0;
-  color565 = (Red5 << 11) | color565;
-  color565 = (Green6 << 5) | color565;
-  color565 = Blue5 | color565;
+  uint16_t color565 = ConvertRGB888toRGB565(hexcolor);
 
   config->set_dc(DATA);
   config->set_cs(LOW);
@@ -215,10 +225,7 @@ int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
   // 1. Set the window to exactly this 1×1 pixel (SetWindow ends with RAMWR)
   SetWindow(config, x, x, y, y);
 
-  uint8_t Red5 = (hexcolor >> 19) & 0x1FU;
-  uint8_t Green6 = (hexcolor >> 10) & 0x3FU;
-  uint8_t Blue5 = (hexcolor >> 3) & 0x1FU;
-  uint16_t color565 = (Red5 << 11) | (Green6 << 5) | Blue5;
+  uint16_t color565 = ConvertRGB888toRGB565(hexcolor);
 
   uint8_t color565_High = (color565 >> 8) & 0xFFU;
   uint8_t color565_Low = color565 & 0xFFU;
@@ -359,10 +366,7 @@ static void DrawHLine(ST7789V3_Config *config, uint16_t x, uint16_t y,
   SetWindow(config, x, x + length - 1, y, y);
 
   // Convert to RGB565
-  uint8_t Red5 = (hexcolor >> 19) & 0x1FU;
-  uint8_t Green6 = (hexcolor >> 10) & 0x3FU;
-  uint8_t Blue5 = (hexcolor >> 3) & 0x1FU;
-  uint16_t color565 = (Red5 << 11) | (Green6 << 5) | Blue5;
+  uint16_t color565 = ConvertRGB888toRGB565(hexcolor);
 
   uint8_t color565_High = (color565 >> 8) & 0xFFU;
   uint8_t color565_Low = color565 & 0xFFU;
@@ -411,7 +415,7 @@ void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0,
   }
 }
 
-void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
-                   uint16_t width, uint16_t height, uint32_t hexcolor) {
+// void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
+//                    uint16_t width, uint16_t height, uint32_t hexcolor) {
   
-}
+// }
