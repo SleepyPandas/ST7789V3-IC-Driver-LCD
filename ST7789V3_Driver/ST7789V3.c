@@ -453,3 +453,57 @@ void DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
     DrawHLine(config, x, y + i, width, hexcolor);
   }
 }
+
+void DrawCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center,
+                uint16_t radius, uint32_t hexcolor) {
+
+  // Midpoint circle algorithm (Bresenham's circle)
+  int16_t x = (int16_t)radius;
+  int16_t y = 0;
+  int16_t decision = 1 - x; // Initial decision parameter
+
+  while (x >= y) {
+    // Draw all 8 symmetric octant points
+    DrawPixel(config, x_center + x, y_center + y, hexcolor);
+    DrawPixel(config, x_center - x, y_center + y, hexcolor);
+    DrawPixel(config, x_center + x, y_center - y, hexcolor);
+    DrawPixel(config, x_center - x, y_center - y, hexcolor);
+    DrawPixel(config, x_center + y, y_center + x, hexcolor);
+    DrawPixel(config, x_center - y, y_center + x, hexcolor);
+    DrawPixel(config, x_center + y, y_center - x, hexcolor);
+    DrawPixel(config, x_center - y, y_center - x, hexcolor);
+
+    y++;
+    if (decision <= 0) {
+      decision += 2 * y + 1;
+    } else {
+      x--;
+      decision += 2 * (y - x) + 1;
+    }
+  }
+}
+
+void DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center,
+                      uint16_t y_center, uint16_t radius, uint32_t hexcolor) {
+
+  // Midpoint circle algorithm filling horizontal scanlines
+  int16_t x = (int16_t)radius;
+  int16_t y = 0;
+  int16_t decision = 1 - x;
+
+  while (x >= y) {
+    // Fill horizontal lines between symmetric points
+    DrawHLine(config, x_center - x, y_center + y, 2 * x + 1, hexcolor);
+    DrawHLine(config, x_center - x, y_center - y, 2 * x + 1, hexcolor);
+    DrawHLine(config, x_center - y, y_center + x, 2 * y + 1, hexcolor);
+    DrawHLine(config, x_center - y, y_center - x, 2 * y + 1, hexcolor);
+
+    y++;
+    if (decision <= 0) {
+      decision += 2 * y + 1;
+    } else {
+      x--;
+      decision += 2 * (y - x) + 1;
+    }
+  }
+}
