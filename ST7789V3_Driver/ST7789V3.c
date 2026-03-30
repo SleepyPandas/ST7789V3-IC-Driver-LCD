@@ -424,3 +424,26 @@ void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
   DrawHLine(config, x, y + height - 1, width, hexcolor);
   DrawLine(config, x + width - 1, y, x + width - 1, y + height - 1, hexcolor);
 }
+
+void DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                         uint16_t width, uint16_t height, uint32_t hexcolor) {
+  // Clamp to display boundaries
+  if (x >= config->LCD_Width || y >= config->LCD_Height)
+    return;
+
+  if (x + width > config->LCD_Width) {
+    width = config->LCD_Width - x;
+  }
+  if (y + height > config->LCD_Height) {
+    height = config->LCD_Height - y;
+  }
+
+  // Set the entire rectangle as the draw window, then bulk write
+  SetWindow(config, x, x + width - 1, y, y + height - 1);
+
+  for (uint16_t i = 0; i < height; i++) {
+    DrawHLine(config, x, y + i, width, hexcolor);
+  }
+
+
+}
