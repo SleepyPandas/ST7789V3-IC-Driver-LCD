@@ -2,8 +2,8 @@
  *
  * @file         ST7789V3.h
  * @brief        Header for ST7789V3.c file.
- *               This file contains the common defines of the ST7789V3 driver.
- *
+ *               This file contains the common defines * of the ST7789V3 driver.
+ * @author Anthony / SleepPandas
  */
 
 #ifndef __ST7789V3_H
@@ -169,8 +169,17 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor);
  */
 
 void SetRotation(ST7789V3_Config *config, Orientation orientation);
-// To be inplemented but will USE DMA
-/** TODO: implement */
-void WriteDataBuffer(ST7789V3_Config *config);
+
+/**
+ * @brief Draws a string on the display
+ * @param config, x, y, str, hexcolor, font
+ * @note Supports \n and \r for new lines and carriage returns
+ * @note Supports line wrap if the next character exceeds LCD width
+ */
+
+void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str,
+                uint32_t hexcolor, const FontDef *font);
+
+
 
 #endif /* __ST7789V3_H */
