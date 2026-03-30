@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include <sys/_intsup.h>
 
-
 // --------- Register Maps -----------
 #define ST7789V3_rst
 #define ST7789V3_backlight
@@ -177,9 +176,38 @@ void SetRotation(ST7789V3_Config *config, Orientation orientation);
  * @note Supports line wrap if the next character exceeds LCD width
  */
 
-void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str,
-                uint32_t hexcolor, const FontDef *font);
+void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                const char *str, uint32_t hexcolor, const FontDef *font);
 
+/**
+ * @brief Draws a line between two points using Bresenham's line algorithm
+ */
 
+void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0, uint16_t x1,
+              uint16_t y1, uint32_t hexcolor);
+
+/**
+ * @brief Draws an outlined rectangle (no fill)
+ */
+void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                   uint16_t width, uint16_t height, uint32_t hexcolor);
+
+/**
+ * @brief Draws a filled rectangle
+ */
+void DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                         uint16_t width, uint16_t height, uint32_t hexcolor);
+
+/**
+ * @brief Draws a circle outline using the midpoint circle algorithm
+ */
+void DrawCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center,
+                uint16_t radius, uint32_t hexcolor);
+
+/**
+ * @brief Draws a filled circle using the midpoint circle algorithm
+ */
+void DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center,
+                      uint16_t y_center, uint16_t radius, uint32_t hexcolor);
 
 #endif /* __ST7789V3_H */
