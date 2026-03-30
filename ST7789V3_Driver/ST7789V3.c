@@ -183,9 +183,6 @@ static uint16_t ConvertRGB888toRGB565(uint32_t hexcolor) {
   return color565;
 }
 
-
-
-
 /**
  * @brief Fill the entire LCD with a single RGB565 color. e.g
  * take orange convert it to 5 bit 6 bit 5 bit
@@ -237,9 +234,7 @@ int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
   config->set_cs(HIGH);
 
   return 0;
-
 }
-
 
 void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
               uint32_t hexcolor, const FontDef *font) {
@@ -261,7 +256,8 @@ void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
       uint8_t bit_index = col % 8;
 
       // Extract the row data for this specific row and byte column
-      uint8_t line_data = font->data[char_offset + (row * font->bytes_per_row) + byte_index];
+      uint8_t line_data =
+          font->data[char_offset + (row * font->bytes_per_row) + byte_index];
 
       // Font arrays store pixels horizontally MSB -> LSB
       if (line_data & (1 << (7 - bit_index))) {
@@ -275,28 +271,29 @@ void DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char,
 void SetRotation(ST7789V3_Config *config, Orientation orientation) {
   uint8_t madctl_value = 0;
 
-  // The ST7789V3 supports 4 standard rotations: 0, 90, 180, 270 degrees but we use a typedef enum because I am not going to remember the values
+  // The ST7789V3 supports 4 standard rotations: 0, 90, 180, 270 degrees but we
+  // use a typedef enum because I am not going to remember the values
   switch (orientation) {
-    case Portrait: // 0 Degrees (Portrait)
-      madctl_value = 0x00;
-      config->LCD_Width = 172;
-      config->LCD_Height = 320;
-      break;
-    case Landscape: // 90 Degrees (Landscape)
-      madctl_value = 0x60; // MV = 1, MX = 1
-      config->LCD_Width = 320;
-      config->LCD_Height = 172;
-      break;
-    case Portrait_Inverted: // 180 Degrees (Portrait Inverted)
-      madctl_value = 0xC0; // MY = 1, MX = 1
-      config->LCD_Width = 172;
-      config->LCD_Height = 320;
-      break;
-    case Landscape_Inverted: // 270 Degrees (Landscape Inverted)
-      madctl_value = 0xA0; // MY = 1, MV = 1
-      config->LCD_Width = 320;
-      config->LCD_Height = 172;
-      break;
+  case Portrait: // 0 Degrees (Portrait)
+    madctl_value = 0x00;
+    config->LCD_Width = 172;
+    config->LCD_Height = 320;
+    break;
+  case Landscape:        // 90 Degrees (Landscape)
+    madctl_value = 0x60; // MV = 1, MX = 1
+    config->LCD_Width = 320;
+    config->LCD_Height = 172;
+    break;
+  case Portrait_Inverted: // 180 Degrees (Portrait Inverted)
+    madctl_value = 0xC0;  // MY = 1, MX = 1
+    config->LCD_Width = 172;
+    config->LCD_Height = 320;
+    break;
+  case Landscape_Inverted: // 270 Degrees (Landscape Inverted)
+    madctl_value = 0xA0;   // MY = 1, MV = 1
+    config->LCD_Width = 320;
+    config->LCD_Height = 172;
+    break;
   }
 
   // Update offsets based on the MV bit (bit 5).
@@ -316,8 +313,8 @@ void SetRotation(ST7789V3_Config *config, Orientation orientation) {
   WriteData(config, madctl_value);
 }
 
-void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str,
-                uint32_t hexcolor, const FontDef *font) {
+void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                const char *str, uint32_t hexcolor, const FontDef *font) {
   uint16_t start_x = x;
   // until null terminator
   while (*str) {
@@ -380,14 +377,14 @@ static void DrawHLine(ST7789V3_Config *config, uint16_t x, uint16_t y,
   config->set_cs(HIGH);
 }
 
-void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0,
-              uint16_t x1, uint16_t y1, uint32_t hexcolor) {
+void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0, uint16_t x1,
+              uint16_t y1, uint32_t hexcolor) {
 
   // Bresenham's line algorithm using integer-only arithmetic
-  // This completely avoids floating point math that most MCUs aren;t efficient at
-  // due to lack of FPU 
-  int16_t dx  =  (x1 > x0) ? (int16_t)(x1 - x0) : -(int16_t)(x0 - x1);
-  int16_t dy  = -((y1 > y0) ? (int16_t)(y1 - y0) : -(int16_t)(y0 - y1));
+  // This completely avoids floating point math that most MCUs aren;t efficient
+  // at due to lack of FPU
+  int16_t dx = (x1 > x0) ? (int16_t)(x1 - x0) : -(int16_t)(x0 - x1);
+  int16_t dy = -((y1 > y0) ? (int16_t)(y1 - y0) : -(int16_t)(y0 - y1));
 
   int16_t sx = (x0 < x1) ? 1 : -1;
   int16_t sy = (y0 < y1) ? 1 : -1;
@@ -400,23 +397,34 @@ void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0,
   while (1) {
     DrawPixel(config, (uint16_t)cx, (uint16_t)cy, hexcolor);
 
-    if (cx == (int16_t)x1 && cy == (int16_t)y1) break;
+    if (cx == (int16_t)x1 && cy == (int16_t)y1)
+      break;
 
     int16_t e2 = 2 * err;
 
     if (e2 >= dy) {
       err += dy;
-      cx  += sx;
+      cx += sx;
     }
     if (e2 <= dx) {
       err += dx;
-      cy  += sy;
+      cy += sy;
     }
   }
 }
 
 void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
                    uint16_t width, uint16_t height, uint32_t hexcolor) {
+
+  if (x >= config->LCD_Width || y >= config->LCD_Height)
+    return;
+  if (x + width > config->LCD_Width) {
+    width = config->LCD_Width - x;
+  }
+  if (y + height > config->LCD_Height) {
+    height = config->LCD_Height - y;
+  }
+
   SetWindow(config, x, x + width - 1, y, y);
 
   DrawHLine(config, x, y, width, hexcolor);
@@ -444,6 +452,4 @@ void DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
   for (uint16_t i = 0; i < height; i++) {
     DrawHLine(config, x, y + i, width, hexcolor);
   }
-
-
 }
