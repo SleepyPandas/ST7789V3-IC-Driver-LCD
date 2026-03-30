@@ -424,8 +424,6 @@ void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
     height = config->LCD_Height - y;
   }
 
-  SetWindow(config, x, x + width - 1, y, y);
-
   DrawHLine(config, x, y, width, hexcolor);
   DrawLine(config, x, y, x, y + height - 1, hexcolor);
   DrawHLine(config, x, y + height - 1, width, hexcolor);
@@ -444,9 +442,6 @@ void DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
   if (y + height > config->LCD_Height) {
     height = config->LCD_Height - y;
   }
-
-  // Set the entire rectangle as the draw window, then bulk write
-  SetWindow(config, x, x + width - 1, y, y + height - 1);
 
   for (uint16_t i = 0; i < height; i++) {
     DrawHLine(config, x, y + i, width, hexcolor);
