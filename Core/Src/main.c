@@ -158,16 +158,28 @@ int main(void) {
   //   DrawPixel(&config, i, 160, COLOR_LIME);
   // }
 
-  DrawPixel(&config, 86, 160, COLOR_GRAY);
+  DrawPixel(&config, 86, 160, GRAY);
 
   SetRotation(&config, Landscape);
 
-  DrawChar(&config, 50, 70, 'C', COLOR_CYAN, &Font_16x16);
-  DrawChar(&config, 50, 20, '5', COLOR_CYAN, &Font_24x32);
-  DrawChar(&config, 50, 180, '9', COLOR_CYAN, &Font_48x48);
+  DrawChar(&config, 50, 70, 'C', CYAN, &Font_16x16);
+  DrawChar(&config, 50, 20, '5', CYAN, &Font_24x32);
+  DrawChar(&config, 50, 180, '9', CYAN, &Font_48x48);
 
-  DrawString(&config, 50, 100, "Hello World\nThis is a test", COLOR_CYAN,
+  DrawString(&config, 50, 100, "Hello World\nThis is a test", CYAN,
              &Font_16x16);
+
+  DrawLine(&config, 50, 50, 100, 100, WHITE);
+
+  DrawString(&config, 20, 50, "CAR\rTomato", BLACK,
+             &Font_16x16);
+
+   DrawRectangle(&config, 50, 25, 50, 50, WHITE);
+
+  DrawFilledRectangle(&config, 50, 50, 100, 100, GREEN);
+
+  DrawCircle(&config, 86, 160, 50, WHITE);
+  DrawFilledCircle(&config, 86, 160, 25, RED);
 
   /* USER CODE END 2 */
 
