@@ -171,8 +171,7 @@ void SleepMode(ST7789V3_Config *config, Sleep_State sleepstate) {
 // =============== Graphical Functions ================
 
 /**
- * @brief Helper to draw a horizontal line efficiently using
- * More efficient than calling DrawPixel in a loop or Drawline
+ * @brief Helper to convert RGB888 to RGB565
  */
 
 static uint16_t ConvertRGB888toRGB565(uint32_t hexcolor) {
