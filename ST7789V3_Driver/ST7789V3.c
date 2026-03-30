@@ -338,3 +338,42 @@ void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str
     str++;
   }
 }
+
+// =============== Shape Drawing Functions ================
+
+
+
+void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0,
+              uint16_t x1, uint16_t y1, uint32_t hexcolor) {
+
+  // Bresenham's line algorithm using integer-only arithmetic
+  // This completely avoids floating point math that most MCUs aren;t efficient at
+  // due to lack of FPU 
+  int16_t dx  =  (x1 > x0) ? (int16_t)(x1 - x0) : -(int16_t)(x0 - x1);
+  int16_t dy  = -((y1 > y0) ? (int16_t)(y1 - y0) : -(int16_t)(y0 - y1));
+
+  int16_t sx = (x0 < x1) ? 1 : -1;
+  int16_t sy = (y0 < y1) ? 1 : -1;
+
+  int16_t err = dx + dy;
+
+  int16_t cx = (int16_t)x0;
+  int16_t cy = (int16_t)y0;
+
+  while (1) {
+    DrawPixel(config, (uint16_t)cx, (uint16_t)cy, hexcolor);
+
+    if (cx == (int16_t)x1 && cy == (int16_t)y1) break;
+
+    int16_t e2 = 2 * err;
+
+    if (e2 >= dy) {
+      err += dy;
+      cx  += sx;
+    }
+    if (e2 <= dx) {
+      err += dx;
+      cy  += sy;
+    }
+  }
+}
