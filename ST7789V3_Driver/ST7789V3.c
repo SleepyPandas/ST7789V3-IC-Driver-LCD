@@ -415,7 +415,12 @@ void DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0,
   }
 }
 
-// void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
-//                    uint16_t width, uint16_t height, uint32_t hexcolor) {
-  
-// }
+void DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y,
+                   uint16_t width, uint16_t height, uint32_t hexcolor) {
+  SetWindow(config, x, x + width - 1, y, y);
+
+  DrawHLine(config, x, y, width, hexcolor);
+  DrawLine(config, x, y, x, y + height - 1, hexcolor);
+  DrawHLine(config, x, y + height - 1, width, hexcolor);
+  DrawLine(config, x + width - 1, y, x + width - 1, y + height - 1, hexcolor);
+}
