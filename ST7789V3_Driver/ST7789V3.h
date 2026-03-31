@@ -11,7 +11,7 @@
 
 #include <fonts/fonts.h>
 #include <stdint.h>
-#include <sys/_intsup.h>
+
 
 // --------- Register Maps -----------
 #define ST7789V3_rst
