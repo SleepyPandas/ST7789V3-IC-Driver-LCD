@@ -83,6 +83,17 @@ typedef enum {
   Landscape_Inverted = 3,
 } Orientation;
 
+typedef enum {
+  ST7789_STATE_READY = 0,
+  ST7789_STATE_BUSY = 1,
+  ST7789_STATE_ERROR = 2,
+} ST7789V3_State;
+
+typedef struct ST7789V3_Config ST7789V3_Config;
+
+// These callbacks let the app react when an async transfer finishes.
+typedef void (*ST7789V3_Callback)(ST7789V3_Config *config, void *user_data);
+
 #define Display_On_Register 0x29U
 #define Display_Off_Register 0x28U
 
@@ -99,13 +110,11 @@ typedef enum {
 
 // DC LOW Command DC High Data
 
-typedef struct {
+struct ST7789V3_Config {
   // --- function pointers ---
   int8_t (*spi_write)(uint16_t len, const uint8_t *pData);
+  int8_t (*spi_write_dma)(uint16_t len, const uint8_t *pData);
   void (*delay_ms)(uint32_t milliseconds);
-
-  // FOR DMA INTEGRATION TODO: LATER
-  // int8_t (*wait_for_tx_complete_DMA)();
 
   int8_t (*set_cs)(GPIO_Pinstate state);
   int8_t (*set_dc)(Trans_State state);
@@ -126,7 +135,19 @@ typedef struct {
   // Display Inversion State
   Inversion_Mode Inversion_Mode;
 
-} ST7789V3_Config;
+  // DMA State (can be changed by External Factors)
+  volatile ST7789V3_State State;
+
+  // Active transfer info used by the DMA/async path.
+  const uint8_t *active_buffer;
+  uint16_t active_length;
+  int8_t last_error;
+
+  // User callbacks for transfer complete and transfer error.
+  ST7789V3_Callback tx_complete_callback;
+  ST7789V3_Callback tx_error_callback;
+  void *callback_user_data;
+};
 
 void ST7789V3_init(ST7789V3_Config *config);
 
