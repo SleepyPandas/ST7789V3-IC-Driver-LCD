@@ -10,8 +10,8 @@
  */
 
 #include "ST7789V3.h"
+#include <stddef.h>
 #include <stdint.h>
-#include <sys/types.h>
 
 // ------------ PRIVATE HELPER FUNCTIONS ------------------
 
@@ -499,5 +499,52 @@ void DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center,
       x--;
       decision += 2 * (y - x) + 1;
     }
+  }
+}
+
+// =============== DMA Functions ================
+
+int8_t ST7789V3_WriteBuffer_DMA(ST7789V3_Config *config,
+                                const uint8_t *buf, uint16_t len) {
+  // return -1 if DMA is not available
+  if (config->spi_write_dma == NULL) {
+    return -1;
+  }
+
+  // Non-blocking DMA path
+  if (config->State != ST7789_STATE_READY) {
+    return -1; // Busy
+  }
+
+  config->State = ST7789_STATE_BUSY;
+  config->set_dc(DATA);
+  config->set_cs(LOW);
+
+  int8_t ret = config->spi_write_dma(len, buf);
+  if (ret != 0) {
+    config->set_cs(HIGH);
+    config->State = ST7789_STATE_ERROR;
+    return ret;
+  }
+
+  // CS stays LOW — released by ST7789V3_DMA_Complete() in the ISR
+  return 0;
+}
+
+void ST7789V3_DMA_Complete(ST7789V3_Config *config) {
+  config->set_cs(HIGH);
+  config->State = ST7789_STATE_READY;
+
+  if (config->tx_complete_callback) {
+    config->tx_complete_callback(config, config->callback_user_data);
+  }
+}
+
+void ST7789V3_DMA_Error(ST7789V3_Config *config) {
+  config->set_cs(HIGH);
+  config->State = ST7789_STATE_ERROR;
+
+  if (config->tx_error_callback) {
+    config->tx_error_callback(config, config->callback_user_data);
   }
 }
