@@ -230,7 +230,7 @@ void DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center,
 
 /**
  * @brief Write a pixel-data buffer to the display via DMA (non-blocking).
- *        Falls back to blocking spi_write if spi_write_dma is NULL.
+ *        returns -1 if null.
  *        Caller must call SetWindow() before this.
  *        CS is held LOW until ST7789V3_DMA_Complete() is called from ISR.
  */
