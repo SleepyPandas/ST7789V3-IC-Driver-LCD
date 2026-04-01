@@ -111,9 +111,9 @@ typedef void (*ST7789V3_Callback)(ST7789V3_Config *config, void *user_data);
 // DC LOW Command DC High Data
 
 struct ST7789V3_Config {
-  // --- function pointers ---
+  // --- Platform function pointers (user fills these in) ---
   int8_t (*spi_write)(uint16_t len, const uint8_t *pData);
-  int8_t (*spi_write_dma)(uint16_t len, const uint8_t *pData);
+  int8_t (*spi_write_dma)(uint16_t len, const uint8_t *pData);  // NULL = no DMA
   void (*delay_ms)(uint32_t milliseconds);
 
   int8_t (*set_cs)(GPIO_Pinstate state);
@@ -137,11 +137,6 @@ struct ST7789V3_Config {
 
   // DMA State (can be changed by External Factors)
   volatile ST7789V3_State State;
-
-  // Active transfer info used by the DMA/async path.
-  const uint8_t *active_buffer;
-  uint16_t active_length;
-  int8_t last_error;
 
   // User callbacks for transfer complete and transfer error.
   ST7789V3_Callback tx_complete_callback;
@@ -230,5 +225,28 @@ void DrawCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center,
  */
 void DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center,
                       uint16_t y_center, uint16_t radius, uint32_t hexcolor);
+
+// =============== DMA Functions ================
+
+/**
+ * @brief Write a pixel-data buffer to the display via DMA (non-blocking).
+ *        Falls back to blocking spi_write if spi_write_dma is NULL.
+ *        Caller must call SetWindow() before this.
+ *        CS is held LOW until ST7789V3_DMA_Complete() is called from ISR.
+ */
+int8_t ST7789V3_WriteBuffer_DMA(ST7789V3_Config *config,
+                                const uint8_t *buf, uint16_t len);
+
+/**
+ * @brief Call from your DMA-transfer-complete ISR to release CS and fire
+ *        the tx_complete_callback.
+ */
+void ST7789V3_DMA_Complete(ST7789V3_Config *config);
+
+/**
+ * @brief Call from your DMA-error ISR to release CS and fire
+ *        the tx_error_callback.
+ */
+void ST7789V3_DMA_Error(ST7789V3_Config *config);
 
 #endif /* __ST7789V3_H */
