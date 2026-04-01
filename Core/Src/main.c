@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ST7789V3.h"
+#include "fonts/fonts.h"
 
 /* USER CODE END Includes */
 
@@ -90,6 +92,26 @@ int8_t spi_write(uint16_t len, const uint8_t *pData) {
   return 0;
 }
 
+int8_t spi_write_dma(uint16_t len, const uint8_t *pData) {
+  if (HAL_SPI_Transmit_DMA(&hspi1, pData, len) != HAL_OK) {
+    return -1;
+  }
+  return 0;
+}
+
+// Called by HAL when DMA transfer finishes — routes into the driver
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
+  if (hspi->Instance == SPI1) {
+    ST7789V3_DMA_Complete(&config);
+  }
+}
+
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
+  if (hspi->Instance == SPI1) {
+    ST7789V3_DMA_Error(&config);
+  }
+}
+
 // backlight default on
 
 // int8_t set_backlight(GPIO_Pinstate state) {
@@ -111,7 +133,9 @@ int main(void)
   config.set_rst = set_rst;
 
   config.spi_write = spi_write;
+  config.spi_write_dma = spi_write_dma;  // Set to NULL to disable DMA
   config.delay_ms = HAL_Delay;
+  config.State = ST7789_STATE_READY;
 
   config.LCD_Width = 172;
   config.LCD_Height = 320;
@@ -169,7 +193,7 @@ int main(void)
   DrawString(&config, 20, 50, "CAR\rTomato", BLACK,
              &Font_16x16);
 
-   DrawRectangle(&config, 50, 25, 50, 50, WHITE);
+  DrawRectangle(&config, 50, 25, 50, 50, WHITE);
 
   DrawFilledRectangle(&config, 50, 50, 100, 100, GREEN);
 
