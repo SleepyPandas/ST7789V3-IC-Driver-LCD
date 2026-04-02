@@ -182,6 +182,35 @@ static uint16_t ConvertRGB888toRGB565(uint32_t hexcolor) {
   return color565;
 }
 
+// Private Helper to build 64 pixel chunks to reduce SPI calls
+#define FILLSCREEN_CHUNK_PIXELS 64U
+
+
+static void FillScreenRepeatedColor(ST7789V3_Config *config, uint16_t color565,
+                                    uint32_t total_pixels) {
+  uint8_t chunk[FILLSCREEN_CHUNK_PIXELS * 2U];
+  uint8_t color565_High = (uint8_t)((color565 >> 8) & 0xFFU);
+  uint8_t color565_Low = (uint8_t)(color565 & 0xFFU);
+
+  for (uint16_t i = 0; i < (uint16_t)sizeof(chunk); i += 2U) {
+    chunk[i] = color565_High;
+    chunk[i + 1U] = color565_Low;
+  }
+
+  config->set_dc(DATA);
+  config->set_cs(LOW);
+
+  while (total_pixels > 0U) {
+    uint16_t chunk_pixels = (total_pixels > FILLSCREEN_CHUNK_PIXELS)
+                                ? FILLSCREEN_CHUNK_PIXELS
+                                : (uint16_t)total_pixels;
+    config->spi_write((uint16_t)(chunk_pixels * 2U), chunk);
+    total_pixels -= chunk_pixels;
+  }
+
+  config->set_cs(HIGH);
+}
+
 /**
  * @brief Fill the entire LCD with a single RGB565 color. e.g
  * take orange convert it to 5 bit 6 bit 5 bit
@@ -196,19 +225,7 @@ void FillScreen(ST7789V3_Config *config, uint32_t hexcolor) {
   // take a default Hex color say 24 bit and extract it #FF FF FF white
   uint16_t color565 = ConvertRGB888toRGB565(hexcolor);
 
-  config->set_dc(DATA);
-  config->set_cs(LOW);
-  // Write Data
-
-  uint8_t color565_High = (color565 >> 8) & 0xFFU;
-  uint8_t color565_Low = color565 & 0xFFU;
-
-  for (uint32_t i = 0; i < total_pixels; i++) {
-    config->spi_write(1, &color565_High);
-    config->spi_write(1, &color565_Low);
-  }
-
-  config->set_cs(HIGH);
+  FillScreenRepeatedColor(config, color565, total_pixels);
 }
 
 int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y,
