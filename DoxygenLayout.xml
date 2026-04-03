@@ -5,7 +5,7 @@
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
     <tab type="pages" visible="yes" title="" intro=""/>
-    <tab type="topics" visible="yes" title="" intro=""/>
+    <tab type="topics" visible="yes" title="Driver Functions" intro=""/>
     <tab type="modules" visible="yes" title="" intro="">
       <tab type="modulelist" visible="yes" title="" intro=""/>
       <tab type="modulemembers" visible="yes" title="" intro=""/>
@@ -36,7 +36,7 @@
       <tab type="exceptionindex" visible="$ALPHABETICAL_INDEX" title=""/>
       <tab type="exceptionhierarchy" visible="yes" title="" intro=""/>
     </tab>
-    <tab type="files" visible="yes" title="">
+    <tab type="files" visible="yes" title="Structure">
       <tab type="filelist" visible="yes" title="" intro=""/>
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>

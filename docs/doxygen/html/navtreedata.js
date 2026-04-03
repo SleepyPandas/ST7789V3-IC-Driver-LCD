@@ -27,8 +27,8 @@ var NAVTREE =
   [ "ST7789V3 1.47 Inch LCD Driver", "index.html", [
     [ "ST7789V3 Driver API Documentation", "index.html", "index" ],
     [ "README", "md__r_e_a_d_m_e.html", null ],
-    [ "Topics", "topics.html", "topics" ],
-    [ "Files", "files.html", [
+    [ "Driver Functions", "topics.html", "topics" ],
+    [ "Structure", "files.html", [
       [ "File List", "files.html", "files_dup" ],
       [ "Globals", "globals.html", [
         [ "All", "globals.html", null ],

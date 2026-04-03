@@ -1,7 +1,26 @@
 var searchData=
 [
-  ['madctl_0',['MADCTL',['../group___s_t7789_v3___driver.html#ga99179758846ea2fb5ac4b7de54e6a4e1',1,'ST7789V3.h']]],
-  ['magenta_1',['MAGENTA',['../group___s_t7789_v3___driver.html#ga6f699060902f800f12aaae150f3a708e',1,'ST7789V3.h']]],
-  ['maroon_2',['MAROON',['../group___s_t7789_v3___driver.html#gacb94f6551a49a0687321b68cc5ff5ae7',1,'ST7789V3.h']]],
-  ['modules_20functions_3',['Modules / Functions',['../index.html#autotoc_md1',1,'']]]
+  ['dark_5fgray_0',['DARK_GRAY',['../group___s_t7789_v3___driver.html#gaca56870f2285abae489635f0ee4d65e3',1,'ST7789V3.h']]],
+  ['dark_5fgreen_1',['DARK_GREEN',['../group___s_t7789_v3___driver.html#ga2ebb0bf1d379e615bda6e25cccf0f08f',1,'ST7789V3.h']]],
+  ['data_2',['data',['../struct_font_def.html#a14947bef4ec6bbb37939a4ba33d8364e',1,'FontDef']]],
+  ['data_3',['DATA',['../group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a9d7d6f31868d66330397c967c4afd2d2',1,'ST7789V3.h']]],
+  ['delay_5fms_4',['delay_ms',['../struct_s_t7789_v3___config.html#aa8f3f868d0647d57cca08a4bb4070616',1,'ST7789V3_Config']]],
+  ['display_20driver_5',['ST7789V3 Display Driver',['../group___s_t7789_v3___driver.html',1,'']]],
+  ['display_5foff_5fregister_6',['Display_Off_Register',['../group___s_t7789_v3___driver.html#ga83c83758da8aeee3fc542dd0d72763d5',1,'ST7789V3.h']]],
+  ['display_5fon_5fregister_7',['Display_On_Register',['../group___s_t7789_v3___driver.html#ga7369c68ab4922e2310cd1c4ba91a4360',1,'ST7789V3.h']]],
+  ['displayoff_8',['DISPLAYOFF',['../group___s_t7789_v3___driver.html#gafb8ac9c064631389fb52728025c3deff',1,'DISPLAYOFF(ST7789V3_Config *config):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gafb8ac9c064631389fb52728025c3deff',1,'DISPLAYOFF(ST7789V3_Config *config):&#160;ST7789V3.c']]],
+  ['displayon_9',['DISPLAYON',['../group___s_t7789_v3___driver.html#gae6c38074b39ce7c56d5c0742c823a5be',1,'DISPLAYON(ST7789V3_Config *config):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gae6c38074b39ce7c56d5c0742c823a5be',1,'DISPLAYON(ST7789V3_Config *config):&#160;ST7789V3.c']]],
+  ['dma_10',['6. Non-Blocking DMA',['../md__r_e_a_d_m_e.html#autotoc_md13',1,'']]],
+  ['documentation_11',['ST7789V3 Driver API Documentation',['../index.html',1,'']]],
+  ['drawchar_12',['DrawChar',['../group___s_t7789_v3___driver.html#ga1a46e0d941f5f9d38da14c6f3b347212',1,'DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char, uint32_t hexcolor, const FontDef *font):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#ga1a46e0d941f5f9d38da14c6f3b347212',1,'DrawChar(ST7789V3_Config *config, uint16_t x, uint16_t y, char user_char, uint32_t hexcolor, const FontDef *font):&#160;ST7789V3.c']]],
+  ['drawcircle_13',['DrawCircle',['../group___s_t7789_v3___driver.html#gae477d737e160c5868cbc6540c20316cd',1,'DrawCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center, uint16_t radius, uint32_t hexcolor):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gae477d737e160c5868cbc6540c20316cd',1,'DrawCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center, uint16_t radius, uint32_t hexcolor):&#160;ST7789V3.c']]],
+  ['drawfilledcircle_14',['DrawFilledCircle',['../group___s_t7789_v3___driver.html#gafda0e16fb96677dd567b79532e39b471',1,'DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center, uint16_t radius, uint32_t hexcolor):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gafda0e16fb96677dd567b79532e39b471',1,'DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center, uint16_t radius, uint32_t hexcolor):&#160;ST7789V3.c']]],
+  ['drawfilledrectangle_15',['DrawFilledRectangle',['../group___s_t7789_v3___driver.html#gaa73ad81f2c3d00bc690347304a088bd0',1,'DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t hexcolor):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gaa73ad81f2c3d00bc690347304a088bd0',1,'DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t hexcolor):&#160;ST7789V3.c']]],
+  ['drawline_16',['DrawLine',['../group___s_t7789_v3___driver.html#gae85b841f3368624a92af15eebd313d63',1,'DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint32_t hexcolor):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gae85b841f3368624a92af15eebd313d63',1,'DrawLine(ST7789V3_Config *config, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint32_t hexcolor):&#160;ST7789V3.c']]],
+  ['drawpixel_17',['DrawPixel',['../group___s_t7789_v3___driver.html#ga68876748fe32cee2398fbc03c9fbd8fd',1,'DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y, uint32_t hexcolor):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#ga68876748fe32cee2398fbc03c9fbd8fd',1,'DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y, uint32_t hexcolor):&#160;ST7789V3.c']]],
+  ['drawrectangle_18',['DrawRectangle',['../group___s_t7789_v3___driver.html#gafa9e115cd4e1b111e3066cdbd3cdc68c',1,'DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t hexcolor):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gafa9e115cd4e1b111e3066cdbd3cdc68c',1,'DrawRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t hexcolor):&#160;ST7789V3.c']]],
+  ['drawstring_19',['DrawString',['../group___s_t7789_v3___driver.html#ga69740737d1ecb09b8d706d7d4ac84f6e',1,'DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str, uint32_t hexcolor, const FontDef *font):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#ga69740737d1ecb09b8d706d7d4ac84f6e',1,'DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str, uint32_t hexcolor, const FontDef *font):&#160;ST7789V3.c']]],
+  ['driver_20',['ST7789V3 Display Driver',['../group___s_t7789_v3___driver.html',1,'']]],
+  ['driver_20api_20documentation_21',['ST7789V3 Driver API Documentation',['../index.html',1,'']]],
+  ['driver_20functions_22',['Driver Functions',['../index.html#autotoc_md1',1,'']]]
 ];

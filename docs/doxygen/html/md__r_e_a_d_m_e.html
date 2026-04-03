@@ -105,7 +105,356 @@ $(function(){initNavTree('md__r_e_a_d_m_e.html',''); initResizable(); });
   <div class="headertitle"><div class="title">README</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a href="https://files.waveshare.com/upload/c/c1/ST7789V3_V0.1.pdf">DATASHEET LCD ST7789V3</a> <a href="https://www.st.com/resource/en/user_manual/um3121-stm32h5-nucleo64-board-mb1814-stmicroelectronics.pdf">DATASHEET STM32H503RB</a> </p>
+<div class="textblock"><p><img src="https://img.shields.io/badge/Language-C-white" alt="Language" class="inline"/> <img src="https://img.shields.io/badge/Architecture-Bare_Metal-blue" alt="Architecture" class="inline"/> <img src="https://img.shields.io/badge/Platform-STM32_ArmCortex_M33-42f5da" alt="Platform" class="inline"/> <img src="https://img.shields.io/badge/Display_Driver_IC-ST7789V3-a442f5" alt="Display-IC" class="inline"/> <img src="https://img.shields.io/badge/I%2FO-SPI_DMA-f7b80a" alt="I/O" class="inline"/> <img src="https://img.shields.io/badge/Build-CMake-e81526" alt="Build" class="inline"/></p>
+<p>A from-scratch, register-level display driver for the ST7789V3 1.47″ LCD (172×320), running on an STM32H503RB (Arm Cortex-M33) with no external graphics libraries. Features a platform-agnostic architecture, non-blocking DMA transfers, a full 2D graphics engine (lines, circles, rectangles, text), RGB888-&gt;RGB565 color conversion, and 10 built-in bitmap fonts.</p>
+<hr  />
+<h2><a class="anchor" id="autotoc_md4"></a>
+Key Features</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">Feature   </th><th class="markdownTableHeadLeft">Implementation    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><b>Platform-Agnostic Driver Design</b>   </td><td class="markdownTableBodyLeft">Function-pointer abstraction (<code><a class="el" href="struct_s_t7789_v3___config.html" title="Runtime configuration and hardware binding for one display instance.">ST7789V3_Config</a></code>) decouples all SPI, GPIO, and timing from any specific HAL - portable to any MCU    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><b>Non-Blocking DMA Transfers</b>   </td><td class="markdownTableBodyLeft"><code>READY -&gt; BUSY -&gt; ERROR</code> state machine with ISR-driven callbacks; CPU is free during pixel writes    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><b>RGB888 -&gt; RGB565 Color Pipeline</b>   </td><td class="markdownTableBodyLeft">Accepts intuitive 24-bit hex colors (<code>0xFF6A00</code>), bit-shifts to 16-bit RGB565 on the fly - no manual conversion needed    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><b>Full 2D Graphics Engine</b>   </td><td class="markdownTableBodyLeft">Bresenham's line algorithm, midpoint circle algorithm, filled shapes - all integer-only arithmetic (no FPU dependency)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><b>Bitmap Font Renderer</b>   </td><td class="markdownTableBodyLeft">MSB-&gt;LSB bitmap parsing with per-row byte indexing; supports <code>\n</code>, <code>\r</code>, and automatic line wrap; 10 font sizes (8×8 -&gt; 64×64)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><b>Chunked SPI Writes</b>   </td><td class="markdownTableBodyLeft"><code>FillScreen</code> builds 64-pixel buffers to minimize SPI transaction overhead instead of pixel-by-pixel writes    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><b>Automatic Memory Offsets</b>   </td><td class="markdownTableBodyLeft">Column/row offsets are auto-calculated from the physical panel size (240×320) vs. active area (172×320), handling the display's memory window    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><b>4-Orientation Rotation</b>   </td><td class="markdownTableBodyLeft">MADCTL register writes with automatic offset recalculation when <code>MV</code> bit swaps hardware axes   </td></tr>
+</table>
+<hr  />
+<h2><a class="anchor" id="autotoc_md6"></a>
+Project Structure</h2>
+<div class="fragment"><div class="line">ST7789V3-Driver-for-1.47-INCH-LCD/</div>
+<div class="line">├── ST7789V3_Driver/</div>
+<div class="line">│   ├── ST7789V3.c              # Driver implementation (graphics + DMA)</div>
+<div class="line">│   ├── ST7789V3.h              # Public API, register map, config struct</div>
+<div class="line">│   └── fonts/</div>
+<div class="line">│       ├── fonts.h             # Font struct definition</div>
+<div class="line">│       ├── font_8x8.c          # 8×8 bitmap font data</div>
+<div class="line">│       ├── font_16x16.c        # …through 64×64</div>
+<div class="line">│       └── ...                 # 10 font sizes total</div>
+<div class="line">├── Core/Src/</div>
+<div class="line">│   └── main.c                  # Platform wrappers, DMA ISR hookup, demo</div>
+<div class="line">├── Drivers/                    # STM32 HAL &amp; CMSIS (vendor-provided)</div>
+<div class="line">├── CMakeLists.txt</div>
+<div class="line">└── STM32H503xx_FLASH.ld       # Linker script</div>
+</div><!-- fragment --><ul>
+<li><a href="ST7789V3_Driver/ST7789V3.c">ST7789V3_Driver/ST7789V3.c</a></li>
+<li><a href="ST7789V3_Driver/ST7789V3.h">ST7789V3_Driver/ST7789V3.h</a></li>
+<li><a href="Core/Src/main.c">Core/Src/main.c</a></li>
+</ul>
+<hr  />
+<h3><a class="anchor" id="autotoc_md8"></a>
+1. HAL Abstraction Layer</h3>
+<p>The driver never calls STM32 HAL directly. All platform I/O - SPI, GPIO control, and timing - is injected through function pointers at initialization. The same driver source compiles unchanged on any microcontroller; only the seven function pointers need to change.</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span><a class="code hl_struct" href="struct_s_t7789_v3___config.html">ST7789V3_Config</a> {</div>
+<div class="line">    <span class="comment">/* Platform I/O - user fills these in */</span></div>
+<div class="line">    int8_t (*<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>)(uint16_t len, <span class="keyword">const</span> uint8_t *pData);</div>
+<div class="line">    int8_t (*<a class="code hl_variable" href="struct_s_t7789_v3___config.html#af7c84a161e207cfb522cab1658ac84b7">spi_write_dma</a>)(uint16_t len, <span class="keyword">const</span> uint8_t *pData);  <span class="comment">// NULL = no DMA</span></div>
+<div class="line">    void   (*<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aa8f3f868d0647d57cca08a4bb4070616">delay_ms</a>)(uint32_t milliseconds);</div>
+<div class="line"> </div>
+<div class="line">    int8_t (*<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ac6df7b9a0524fdd66df0d368fcf6e67f">set_cs</a>)(<a class="code hl_enumeration" href="group___s_t7789_v3___driver.html#ga5287eae6192c8db4b7b8b2d217419aa1">GPIO_Pinstate</a> state);</div>
+<div class="line">    int8_t (*<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">set_dc</a>)(<a class="code hl_enumeration" href="group___s_t7789_v3___driver.html#ga567f37f897b4509a6bdfec5ae72ee8f8">Trans_State</a> state);</div>
+<div class="line">    int8_t (*<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a2a0ab819a87d90bcaf000a0fdb27677e">set_rst</a>)(<a class="code hl_enumeration" href="group___s_t7789_v3___driver.html#ga5287eae6192c8db4b7b8b2d217419aa1">GPIO_Pinstate</a> state);</div>
+<div class="line">    int8_t (*<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a5b9027d7ff68d3943320f4a1e1a28095">set_backlight</a>)(<a class="code hl_enumeration" href="group___s_t7789_v3___driver.html#ga5287eae6192c8db4b7b8b2d217419aa1">GPIO_Pinstate</a> state);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">/* Display attributes */</span></div>
+<div class="line">    uint16_t <a class="code hl_variable" href="struct_s_t7789_v3___config.html#a998c60f1b052e664dfd4e865eb372568">LCD_Width</a>;</div>
+<div class="line">    uint16_t <a class="code hl_variable" href="struct_s_t7789_v3___config.html#a0b8ce52352dce18b82da3265eee53a4b">LCD_Height</a>;</div>
+<div class="line">    uint8_t  <a class="code hl_variable" href="struct_s_t7789_v3___config.html#ad473bd41582cd35a32120ffbb01424bb">Col_Offset</a>;</div>
+<div class="line">    uint8_t  <a class="code hl_variable" href="struct_s_t7789_v3___config.html#a276a62ce331a9507368621cc54ac42ce">Row_Offset</a>;</div>
+<div class="line">    <a class="code hl_enumeration" href="group___s_t7789_v3___driver.html#gae18d0e1f599e550c0e6423437382f222">Color_Mode</a> <a class="code hl_variable" href="struct_s_t7789_v3___config.html#aa1da79728e9b2e10bbca6a19af64c23d">Bit_Depth</a>;</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">/* DMA state machine */</span></div>
+<div class="line">    <span class="keyword">volatile</span> <a class="code hl_enumeration" href="group___s_t7789_v3___driver.html#gaf6492eef7dd1a76b4a87bbb0bc7a1c54">ST7789V3_State</a> <a class="code hl_variable" href="struct_s_t7789_v3___config.html#aaa27d855de66d9841ae7acffacb3f608">State</a>;          <span class="comment">// READY, BUSY, ERROR</span></div>
+<div class="line">    <a class="code hl_typedef" href="group___s_t7789_v3___driver.html#ga929e7d3fe773bc840d7a10a868978b08">ST7789V3_Callback</a> <a class="code hl_variable" href="struct_s_t7789_v3___config.html#ad0ea5b11ca6abbf882b450c7b17c10e8">tx_complete_callback</a>; <span class="comment">// Fired from ISR on success</span></div>
+<div class="line">    <a class="code hl_typedef" href="group___s_t7789_v3___driver.html#ga929e7d3fe773bc840d7a10a868978b08">ST7789V3_Callback</a> <a class="code hl_variable" href="struct_s_t7789_v3___config.html#ae51d8cca4af71d8fb67f9a308a19f658">tx_error_callback</a>;    <span class="comment">// Fired from ISR on failure</span></div>
+<div class="line">    <span class="keywordtype">void</span> *<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a6b88f595fa0b921f1470a7793a2b5b42">callback_user_data</a>;</div>
+<div class="line">};</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga5287eae6192c8db4b7b8b2d217419aa1"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga5287eae6192c8db4b7b8b2d217419aa1">GPIO_Pinstate</a></div><div class="ttdeci">GPIO_Pinstate</div><div class="ttdoc">Logical output level used by GPIO control callbacks.</div><div class="ttdef"><b>Definition</b> ST7789V3.h:113</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga567f37f897b4509a6bdfec5ae72ee8f8"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga567f37f897b4509a6bdfec5ae72ee8f8">Trans_State</a></div><div class="ttdeci">Trans_State</div><div class="ttdoc">Select whether the current SPI byte stream is command or pixel/data content.</div><div class="ttdef"><b>Definition</b> ST7789V3.h:121</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga929e7d3fe773bc840d7a10a868978b08"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga929e7d3fe773bc840d7a10a868978b08">ST7789V3_Callback</a></div><div class="ttdeci">void(* ST7789V3_Callback)(ST7789V3_Config *config, void *user_data)</div><div class="ttdoc">Callback signature used for DMA completion and error notifications.</div><div class="ttdef"><b>Definition</b> ST7789V3.h:182</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gae18d0e1f599e550c0e6423437382f222"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gae18d0e1f599e550c0e6423437382f222">Color_Mode</a></div><div class="ttdeci">Color_Mode</div><div class="ttdoc">Pixel format written to the display controller.</div><div class="ttdef"><b>Definition</b> ST7789V3.h:129</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gaf6492eef7dd1a76b4a87bbb0bc7a1c54"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gaf6492eef7dd1a76b4a87bbb0bc7a1c54">ST7789V3_State</a></div><div class="ttdeci">ST7789V3_State</div><div class="ttdoc">Driver transfer state used for DMA operations.</div><div class="ttdef"><b>Definition</b> ST7789V3.h:164</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html"><div class="ttname"><a href="struct_s_t7789_v3___config.html">ST7789V3_Config</a></div><div class="ttdoc">Runtime configuration and hardware binding for one display instance.</div><div class="ttdef"><b>Definition</b> ST7789V3.h:199</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_a0b8ce52352dce18b82da3265eee53a4b"><div class="ttname"><a href="struct_s_t7789_v3___config.html#a0b8ce52352dce18b82da3265eee53a4b">ST7789V3_Config::LCD_Height</a></div><div class="ttdeci">uint16_t LCD_Height</div><div class="ttdef"><b>Definition</b> ST7789V3.h:211</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_a276a62ce331a9507368621cc54ac42ce"><div class="ttname"><a href="struct_s_t7789_v3___config.html#a276a62ce331a9507368621cc54ac42ce">ST7789V3_Config::Row_Offset</a></div><div class="ttdeci">uint8_t Row_Offset</div><div class="ttdef"><b>Definition</b> ST7789V3.h:214</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_a2a0ab819a87d90bcaf000a0fdb27677e"><div class="ttname"><a href="struct_s_t7789_v3___config.html#a2a0ab819a87d90bcaf000a0fdb27677e">ST7789V3_Config::set_rst</a></div><div class="ttdeci">int8_t(* set_rst)(GPIO_Pinstate state)</div><div class="ttdef"><b>Definition</b> ST7789V3.h:207</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_a5b9027d7ff68d3943320f4a1e1a28095"><div class="ttname"><a href="struct_s_t7789_v3___config.html#a5b9027d7ff68d3943320f4a1e1a28095">ST7789V3_Config::set_backlight</a></div><div class="ttdeci">int8_t(* set_backlight)(GPIO_Pinstate state)</div><div class="ttdef"><b>Definition</b> ST7789V3.h:208</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_a6b88f595fa0b921f1470a7793a2b5b42"><div class="ttname"><a href="struct_s_t7789_v3___config.html#a6b88f595fa0b921f1470a7793a2b5b42">ST7789V3_Config::callback_user_data</a></div><div class="ttdeci">void * callback_user_data</div><div class="ttdef"><b>Definition</b> ST7789V3.h:222</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_a998c60f1b052e664dfd4e865eb372568"><div class="ttname"><a href="struct_s_t7789_v3___config.html#a998c60f1b052e664dfd4e865eb372568">ST7789V3_Config::LCD_Width</a></div><div class="ttdeci">uint16_t LCD_Width</div><div class="ttdef"><b>Definition</b> ST7789V3.h:210</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_aa1da79728e9b2e10bbca6a19af64c23d"><div class="ttname"><a href="struct_s_t7789_v3___config.html#aa1da79728e9b2e10bbca6a19af64c23d">ST7789V3_Config::Bit_Depth</a></div><div class="ttdeci">Color_Mode Bit_Depth</div><div class="ttdef"><b>Definition</b> ST7789V3.h:216</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_aa8f3f868d0647d57cca08a4bb4070616"><div class="ttname"><a href="struct_s_t7789_v3___config.html#aa8f3f868d0647d57cca08a4bb4070616">ST7789V3_Config::delay_ms</a></div><div class="ttdeci">void(* delay_ms)(uint32_t milliseconds)</div><div class="ttdef"><b>Definition</b> ST7789V3.h:203</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_aaa27d855de66d9841ae7acffacb3f608"><div class="ttname"><a href="struct_s_t7789_v3___config.html#aaa27d855de66d9841ae7acffacb3f608">ST7789V3_Config::State</a></div><div class="ttdeci">volatile ST7789V3_State State</div><div class="ttdef"><b>Definition</b> ST7789V3.h:218</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_aadcf7eee0d01e40545ef55c34c6425c1"><div class="ttname"><a href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">ST7789V3_Config::set_dc</a></div><div class="ttdeci">int8_t(* set_dc)(Trans_State state)</div><div class="ttdef"><b>Definition</b> ST7789V3.h:206</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_ac6df7b9a0524fdd66df0d368fcf6e67f"><div class="ttname"><a href="struct_s_t7789_v3___config.html#ac6df7b9a0524fdd66df0d368fcf6e67f">ST7789V3_Config::set_cs</a></div><div class="ttdeci">int8_t(* set_cs)(GPIO_Pinstate state)</div><div class="ttdef"><b>Definition</b> ST7789V3.h:205</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_ad0ea5b11ca6abbf882b450c7b17c10e8"><div class="ttname"><a href="struct_s_t7789_v3___config.html#ad0ea5b11ca6abbf882b450c7b17c10e8">ST7789V3_Config::tx_complete_callback</a></div><div class="ttdeci">ST7789V3_Callback tx_complete_callback</div><div class="ttdef"><b>Definition</b> ST7789V3.h:220</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_ad473bd41582cd35a32120ffbb01424bb"><div class="ttname"><a href="struct_s_t7789_v3___config.html#ad473bd41582cd35a32120ffbb01424bb">ST7789V3_Config::Col_Offset</a></div><div class="ttdeci">uint8_t Col_Offset</div><div class="ttdef"><b>Definition</b> ST7789V3.h:213</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_ae51d8cca4af71d8fb67f9a308a19f658"><div class="ttname"><a href="struct_s_t7789_v3___config.html#ae51d8cca4af71d8fb67f9a308a19f658">ST7789V3_Config::tx_error_callback</a></div><div class="ttdeci">ST7789V3_Callback tx_error_callback</div><div class="ttdef"><b>Definition</b> ST7789V3.h:221</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_af7c84a161e207cfb522cab1658ac84b7"><div class="ttname"><a href="struct_s_t7789_v3___config.html#af7c84a161e207cfb522cab1658ac84b7">ST7789V3_Config::spi_write_dma</a></div><div class="ttdeci">int8_t(* spi_write_dma)(uint16_t len, const uint8_t *pData)</div><div class="ttdef"><b>Definition</b> ST7789V3.h:202</div></div>
+<div class="ttc" id="astruct_s_t7789_v3___config_html_afea37bc911203e6ea57e8a7a4d280579"><div class="ttname"><a href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">ST7789V3_Config::spi_write</a></div><div class="ttdeci">int8_t(* spi_write)(uint16_t len, const uint8_t *pData)</div><div class="ttdef"><b>Definition</b> ST7789V3.h:200</div></div>
+</div><!-- fragment --><p>On the STM32 side, the platform wrappers map directly to HAL calls:</p>
+<div class="fragment"><div class="line"><span class="comment">/* Blocking SPI transmit */</span></div>
+<div class="line">int8_t spi_write(uint16_t len, <span class="keyword">const</span> uint8_t *pData) {</div>
+<div class="line">    <span class="keywordflow">return</span> (HAL_SPI_Transmit(&amp;hspi1, pData, len, HAL_MAX_DELAY) == HAL_OK) ? 0 : -1;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Non-blocking SPI transmit via DMA */</span></div>
+<div class="line">int8_t spi_write_dma(uint16_t len, <span class="keyword">const</span> uint8_t *pData) {</div>
+<div class="line">    <span class="keywordflow">return</span> (HAL_SPI_Transmit_DMA(&amp;hspi1, pData, len) == HAL_OK) ? 0 : -1;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Wire the platform layer to the driver */</span></div>
+<div class="line"><a class="code hl_struct" href="struct_s_t7789_v3___config.html">ST7789V3_Config</a> config = {</div>
+<div class="line">    .<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>     = spi_write,</div>
+<div class="line">    .spi_write_dma = spi_write_dma,   <span class="comment">// Set to NULL to disable DMA</span></div>
+<div class="line">    .delay_ms      = HAL_Delay,</div>
+<div class="line">    .set_cs        = set_cs,</div>
+<div class="line">    .set_dc        = set_dc,</div>
+<div class="line">    .set_rst       = set_rst,</div>
+<div class="line">    .LCD_Width     = 172,</div>
+<div class="line">    .LCD_Height    = 320,</div>
+<div class="line">    .State         = <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54acc25853de420fdbb38c59ca0e19640d8">ST7789_STATE_READY</a>,</div>
+<div class="line">};</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ggaf6492eef7dd1a76b4a87bbb0bc7a1c54acc25853de420fdbb38c59ca0e19640d8"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54acc25853de420fdbb38c59ca0e19640d8">ST7789_STATE_READY</a></div><div class="ttdeci">@ ST7789_STATE_READY</div><div class="ttdef"><b>Definition</b> ST7789V3.h:165</div></div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md9"></a>
+2. Initialization Sequence</h3>
+<p>The ST7789V3 requires a specific startup sequence. The driver executes a hardware reset pulse via GPIO (no SPI yet), waits the datasheet-mandated 120 ms recovery, then begins SPI communication:</p>
+<div class="fragment"><div class="line"><span class="comment">// 1. Hardware reset pulse (GPIO only, no SPI)</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a2a0ab819a87d90bcaf000a0fdb27677e">set_rst</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893">HIGH</a>);  config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aa8f3f868d0647d57cca08a4bb4070616">delay_ms</a>(10);</div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a2a0ab819a87d90bcaf000a0fdb27677e">set_rst</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a6a226f4143ca3b18999551694cdb72a8">LOW</a>);   config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aa8f3f868d0647d57cca08a4bb4070616">delay_ms</a>(10);</div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a2a0ab819a87d90bcaf000a0fdb27677e">set_rst</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893">HIGH</a>);  config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aa8f3f868d0647d57cca08a4bb4070616">delay_ms</a>(120);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 2. Wake from sleep via SPI command</span></div>
+<div class="line">WriteCommand(config, 0x11);   <span class="comment">// SLPOUT</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aa8f3f868d0647d57cca08a4bb4070616">delay_ms</a>(120);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 3. Configure color depth (default 16-bit RGB565)</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#gaceb1d575d900fcb8662c620193eeee8e">SetColorMode</a>(config, <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#ggae18d0e1f599e550c0e6423437382f222a5a13625ddba54b5ba114f90d2b6b38eb">bit_16</a>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 4. Compute memory offsets for undersized panels</span></div>
+<div class="line"><span class="comment">//    Physical memory: 240×320, Active area: 172×320</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ad473bd41582cd35a32120ffbb01424bb">Col_Offset</a> = (240 - config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a998c60f1b052e664dfd4e865eb372568">LCD_Width</a>) / 2;   <span class="comment">// = 34</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a276a62ce331a9507368621cc54ac42ce">Row_Offset</a> = (320 - config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a0b8ce52352dce18b82da3265eee53a4b">LCD_Height</a>) / 2;   <span class="comment">// = 0</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 5. Enable display inversion (required for correct colors on this panel)</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#ga1c794d77143a055e4e4c39913d6c65ad">InvertDisplay</a>(config, <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga8b148ca1cdfef947b5cc803caf446348aa47cfe71ccc5856874b048a1f661e91b">INVON</a>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 6. Turn on display</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#gae6c38074b39ce7c56d5c0742c823a5be">DISPLAYON</a>(config);</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga1c794d77143a055e4e4c39913d6c65ad"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga1c794d77143a055e4e4c39913d6c65ad">InvertDisplay</a></div><div class="ttdeci">void InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion)</div><div class="ttdoc">Enable or disable display inversion.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:107</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gaceb1d575d900fcb8662c620193eeee8e"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gaceb1d575d900fcb8662c620193eeee8e">SetColorMode</a></div><div class="ttdeci">int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth)</div><div class="ttdoc">Set the controller pixel format.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:79</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gae6c38074b39ce7c56d5c0742c823a5be"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gae6c38074b39ce7c56d5c0742c823a5be">DISPLAYON</a></div><div class="ttdeci">void DISPLAYON(ST7789V3_Config *config)</div><div class="ttdoc">Enable display output.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:87</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893">HIGH</a></div><div class="ttdeci">@ HIGH</div><div class="ttdef"><b>Definition</b> ST7789V3.h:114</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gga5287eae6192c8db4b7b8b2d217419aa1a6a226f4143ca3b18999551694cdb72a8"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a6a226f4143ca3b18999551694cdb72a8">LOW</a></div><div class="ttdeci">@ LOW</div><div class="ttdef"><b>Definition</b> ST7789V3.h:115</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gga8b148ca1cdfef947b5cc803caf446348aa47cfe71ccc5856874b048a1f661e91b"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gga8b148ca1cdfef947b5cc803caf446348aa47cfe71ccc5856874b048a1f661e91b">INVON</a></div><div class="ttdeci">@ INVON</div><div class="ttdef"><b>Definition</b> ST7789V3.h:139</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ggae18d0e1f599e550c0e6423437382f222a5a13625ddba54b5ba114f90d2b6b38eb"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ggae18d0e1f599e550c0e6423437382f222a5a13625ddba54b5ba114f90d2b6b38eb">bit_16</a></div><div class="ttdeci">@ bit_16</div><div class="ttdef"><b>Definition</b> ST7789V3.h:131</div></div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md10"></a>
+3. RGB888 -&gt; RGB565 Color Pipeline</h3>
+<p>The public API accepts colors as intuitive 24-bit hex values (<code>0xFF6A00</code> for orange). Internally, the driver bit-shifts each channel down to 5-6-5 bits. This keeps the user-facing API clean while sending the format the display hardware requires.</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> uint16_t ConvertRGB888toRGB565(uint32_t hexcolor) {</div>
+<div class="line">    uint8_t Red5   = (hexcolor &gt;&gt; 19) &amp; 0x1F;   <span class="comment">// 8-bit -&gt; 5-bit</span></div>
+<div class="line">    uint8_t Green6 = (hexcolor &gt;&gt; 10) &amp; 0x3F;   <span class="comment">// 8-bit -&gt; 6-bit</span></div>
+<div class="line">    uint8_t Blue5  = (hexcolor &gt;&gt;  3) &amp; 0x1F;   <span class="comment">// 8-bit -&gt; 5-bit</span></div>
+<div class="line">    <span class="keywordflow">return</span> (Red5 &lt;&lt; 11) | (Green6 &lt;&lt; 5) | Blue5;</div>
+<div class="line">}</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md11"></a>
+4. Window Addressing (CASET / RASET / RAMWR)</h3>
+<p>Before writing pixel data, the display needs to know which rectangular region to fill. The driver sets the column/row address window in a single CS-held-LOW transaction to minimize bus overhead - three commands without releasing the chip select line:</p>
+<div class="fragment"><div class="line"><span class="comment">// Keep CS low for the full window setup</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ac6df7b9a0524fdd66df0d368fcf6e67f">set_cs</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a6a226f4143ca3b18999551694cdb72a8">LOW</a>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Column Address Set (CASET 0x2A) - X boundaries with offset</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">set_dc</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a3ab34dd50405af2d5a62627d572f7860">CMD</a>);   config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>(1, &amp;<a class="code hl_define" href="group___s_t7789_v3___driver.html#gab67de54388f59c7b764a283c34071b58">CASET</a>);</div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">set_dc</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a9d7d6f31868d66330397c967c4afd2d2">DATA</a>);  config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>(4, Column_Data);  <span class="comment">// [X_Start, X_End]</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Row Address Set (RASET 0x2B) - Y boundaries with offset</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">set_dc</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a3ab34dd50405af2d5a62627d572f7860">CMD</a>);   config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>(1, &amp;<a class="code hl_define" href="group___s_t7789_v3___driver.html#gad50b90496112b9a30de5ed4eb04c47a6">RASET</a>);</div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">set_dc</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a9d7d6f31868d66330397c967c4afd2d2">DATA</a>);  config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>(4, Row_Data);     <span class="comment">// [Y_Start, Y_End]</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Memory Write command (RAMWR 0x2C) - display is now ready for pixel data</span></div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">set_dc</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a3ab34dd50405af2d5a62627d572f7860">CMD</a>);   config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>(1, &amp;<a class="code hl_define" href="group___s_t7789_v3___driver.html#ga1155dc7d323928342228a021cd8fd599">RAMWR</a>);</div>
+<div class="line"> </div>
+<div class="line">config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ac6df7b9a0524fdd66df0d368fcf6e67f">set_cs</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893">HIGH</a>);</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga1155dc7d323928342228a021cd8fd599"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga1155dc7d323928342228a021cd8fd599">RAMWR</a></div><div class="ttdeci">#define RAMWR</div><div class="ttdef"><b>Definition</b> ST7789V3.h:65</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gab67de54388f59c7b764a283c34071b58"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gab67de54388f59c7b764a283c34071b58">CASET</a></div><div class="ttdeci">#define CASET</div><div class="ttdef"><b>Definition</b> ST7789V3.h:63</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gad50b90496112b9a30de5ed4eb04c47a6"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gad50b90496112b9a30de5ed4eb04c47a6">RASET</a></div><div class="ttdeci">#define RASET</div><div class="ttdef"><b>Definition</b> ST7789V3.h:64</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gga567f37f897b4509a6bdfec5ae72ee8f8a3ab34dd50405af2d5a62627d572f7860"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a3ab34dd50405af2d5a62627d572f7860">CMD</a></div><div class="ttdeci">@ CMD</div><div class="ttdef"><b>Definition</b> ST7789V3.h:123</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gga567f37f897b4509a6bdfec5ae72ee8f8a9d7d6f31868d66330397c967c4afd2d2"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a9d7d6f31868d66330397c967c4afd2d2">DATA</a></div><div class="ttdeci">@ DATA</div><div class="ttdef"><b>Definition</b> ST7789V3.h:122</div></div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md12"></a>
+5. Graphics Engine</h3>
+<p><b>Shapes</b> - Lines use Bresenham's algorithm and circles use the midpoint circle algorithm, both integer-only to avoid FPU dependency. Filled shapes use optimized horizontal scanlines (<code>DrawHLine</code>) with boundary clamping.</p>
+<div class="fragment"><div class="line"><span class="comment">// Bresenham&#39;s line - integer-only, no floats</span></div>
+<div class="line">int16_t err = dx + dy;</div>
+<div class="line"><span class="keywordflow">while</span> (1) {</div>
+<div class="line">    <a class="code hl_function" href="group___s_t7789_v3___driver.html#ga68876748fe32cee2398fbc03c9fbd8fd">DrawPixel</a>(config, cx, cy, hexcolor);</div>
+<div class="line">    <span class="keywordflow">if</span> (cx == x1 &amp;&amp; cy == y1) <span class="keywordflow">break</span>;</div>
+<div class="line">    int16_t e2 = 2 * err;</div>
+<div class="line">    <span class="keywordflow">if</span> (e2 &gt;= dy) { err += dy; cx += sx; }</div>
+<div class="line">    <span class="keywordflow">if</span> (e2 &lt;= dx) { err += dx; cy += sy; }</div>
+<div class="line">}</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga68876748fe32cee2398fbc03c9fbd8fd"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga68876748fe32cee2398fbc03c9fbd8fd">DrawPixel</a></div><div class="ttdeci">int8_t DrawPixel(ST7789V3_Config *config, uint16_t x, uint16_t y, uint32_t hexcolor)</div><div class="ttdoc">Draw a single pixel using a 24-bit RGB888 input color.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:239</div></div>
+</div><!-- fragment --><p><b>Text</b> - The font renderer walks each character's bitmap data MSB-&gt;LSB, extracting pixel-on/off state from packed byte arrays. It supports <code>\n</code> for newlines, <code>\r</code> for carriage return, and automatically wraps text when the next character would exceed the display width.</p>
+<div class="fragment"><div class="line"><span class="comment">// Extract a single pixel from the font bitmap</span></div>
+<div class="line">uint8_t byte_index = col / 8;</div>
+<div class="line">uint8_t bit_index  = col % 8;</div>
+<div class="line">uint8_t line_data  = font-&gt;data[char_offset + (row * font-&gt;bytes_per_row) + byte_index];</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">if</span> (line_data &amp; (1 &lt;&lt; (7 - bit_index))) {</div>
+<div class="line">    <a class="code hl_function" href="group___s_t7789_v3___driver.html#ga68876748fe32cee2398fbc03c9fbd8fd">DrawPixel</a>(config, x + col, y + row, hexcolor);   <span class="comment">// Foreground pixel</span></div>
+<div class="line">}</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md13"></a>
+6. Non-Blocking DMA</h3>
+<p>The DMA subsystem uses a three-state machine (<code>READY</code>, <code>BUSY</code>, <code>ERROR</code>) with ISR-driven callbacks. When <code>spi_write_dma</code> is not <code>NULL</code>, large pixel buffers can be sent without blocking the CPU. CS is held LOW during the transfer and released by the ISR handler.</p>
+<div class="fragment"><div class="line">int8_t <a class="code hl_function" href="group___s_t7789_v3___driver.html#gaf9154b52a6a2cb68c6d7fdd1fe9278b5">ST7789V3_WriteBuffer_DMA</a>(<a class="code hl_struct" href="struct_s_t7789_v3___config.html">ST7789V3_Config</a> *config,</div>
+<div class="line">                                <span class="keyword">const</span> uint8_t *buf, uint16_t len) {</div>
+<div class="line">    <span class="keywordflow">if</span> (config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#af7c84a161e207cfb522cab1658ac84b7">spi_write_dma</a> == NULL) <span class="keywordflow">return</span> -1;   <span class="comment">// DMA not available</span></div>
+<div class="line">    <span class="keywordflow">if</span> (config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aaa27d855de66d9841ae7acffacb3f608">State</a> != <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54acc25853de420fdbb38c59ca0e19640d8">ST7789_STATE_READY</a>) <span class="keywordflow">return</span> -1;   <span class="comment">// Busy guard</span></div>
+<div class="line"> </div>
+<div class="line">    config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aaa27d855de66d9841ae7acffacb3f608">State</a> = <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54a88b7369b3d1a087ad15506c2449b36df">ST7789_STATE_BUSY</a>;</div>
+<div class="line">    config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aadcf7eee0d01e40545ef55c34c6425c1">set_dc</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga567f37f897b4509a6bdfec5ae72ee8f8a9d7d6f31868d66330397c967c4afd2d2">DATA</a>);</div>
+<div class="line">    config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ac6df7b9a0524fdd66df0d368fcf6e67f">set_cs</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a6a226f4143ca3b18999551694cdb72a8">LOW</a>);   <span class="comment">// Held LOW until ISR calls DMA_Complete</span></div>
+<div class="line"> </div>
+<div class="line">    int8_t ret = config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#af7c84a161e207cfb522cab1658ac84b7">spi_write_dma</a>(len, buf);</div>
+<div class="line">    <span class="keywordflow">if</span> (ret != 0) {</div>
+<div class="line">        config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ac6df7b9a0524fdd66df0d368fcf6e67f">set_cs</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893">HIGH</a>);</div>
+<div class="line">        config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aaa27d855de66d9841ae7acffacb3f608">State</a> = <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54a69a3fc2024be6cdea274f1a8557788ac">ST7789_STATE_ERROR</a>;</div>
+<div class="line">    }</div>
+<div class="line">    <span class="keywordflow">return</span> ret;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Called from your SPI DMA transfer-complete ISR */</span></div>
+<div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="group___s_t7789_v3___driver.html#ga4eae5d1d40df016237983eb9912903cc">ST7789V3_DMA_Complete</a>(<a class="code hl_struct" href="struct_s_t7789_v3___config.html">ST7789V3_Config</a> *config) {</div>
+<div class="line">    config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ac6df7b9a0524fdd66df0d368fcf6e67f">set_cs</a>(<a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893">HIGH</a>);</div>
+<div class="line">    config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#aaa27d855de66d9841ae7acffacb3f608">State</a> = <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54acc25853de420fdbb38c59ca0e19640d8">ST7789_STATE_READY</a>;</div>
+<div class="line">    <span class="keywordflow">if</span> (config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ad0ea5b11ca6abbf882b450c7b17c10e8">tx_complete_callback</a>)</div>
+<div class="line">        config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#ad0ea5b11ca6abbf882b450c7b17c10e8">tx_complete_callback</a>(config, config-&gt;<a class="code hl_variable" href="struct_s_t7789_v3___config.html#a6b88f595fa0b921f1470a7793a2b5b42">callback_user_data</a>);</div>
+<div class="line">}</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga4eae5d1d40df016237983eb9912903cc"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga4eae5d1d40df016237983eb9912903cc">ST7789V3_DMA_Complete</a></div><div class="ttdeci">void ST7789V3_DMA_Complete(ST7789V3_Config *config)</div><div class="ttdoc">Finish a successful DMA transfer and run the completion callback.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:559</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gaf9154b52a6a2cb68c6d7fdd1fe9278b5"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gaf9154b52a6a2cb68c6d7fdd1fe9278b5">ST7789V3_WriteBuffer_DMA</a></div><div class="ttdeci">int8_t ST7789V3_WriteBuffer_DMA(ST7789V3_Config *config, const uint8_t *buf, uint16_t len)</div><div class="ttdoc">Start a non-blocking DMA write of pixel data to the display.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:532</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ggaf6492eef7dd1a76b4a87bbb0bc7a1c54a69a3fc2024be6cdea274f1a8557788ac"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54a69a3fc2024be6cdea274f1a8557788ac">ST7789_STATE_ERROR</a></div><div class="ttdeci">@ ST7789_STATE_ERROR</div><div class="ttdef"><b>Definition</b> ST7789V3.h:167</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ggaf6492eef7dd1a76b4a87bbb0bc7a1c54a88b7369b3d1a087ad15506c2449b36df"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54a88b7369b3d1a087ad15506c2449b36df">ST7789_STATE_BUSY</a></div><div class="ttdeci">@ ST7789_STATE_BUSY</div><div class="ttdef"><b>Definition</b> ST7789V3.h:166</div></div>
+</div><!-- fragment --><p>Platform-side ISR hookup:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {</div>
+<div class="line">    <span class="keywordflow">if</span> (hspi-&gt;Instance == SPI1)</div>
+<div class="line">        <a class="code hl_function" href="group___s_t7789_v3___driver.html#ga4eae5d1d40df016237983eb9912903cc">ST7789V3_DMA_Complete</a>(&amp;config);</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">void</span> HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {</div>
+<div class="line">    <span class="keywordflow">if</span> (hspi-&gt;Instance == SPI1)</div>
+<div class="line">        <a class="code hl_function" href="group___s_t7789_v3___driver.html#gad6ebff2a95e0b99970dd73ad458c9950">ST7789V3_DMA_Error</a>(&amp;config);</div>
+<div class="line">}</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gad6ebff2a95e0b99970dd73ad458c9950"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gad6ebff2a95e0b99970dd73ad458c9950">ST7789V3_DMA_Error</a></div><div class="ttdeci">void ST7789V3_DMA_Error(ST7789V3_Config *config)</div><div class="ttdoc">Finish a failed DMA transfer and run the error callback.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:568</div></div>
+</div><!-- fragment --><hr  />
+<h3><a class="anchor" id="autotoc_md15"></a>
+Hardware</h3>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">Component   </th><th class="markdownTableHeadLeft">Detail    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><b>Microcontroller</b>   </td><td class="markdownTableBodyLeft">STM32H503RB Nucleo-64 (Arm Cortex-M33, 250 MHz)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><b>Display</b>   </td><td class="markdownTableBodyLeft">Waveshare 1.47″ LCD Module (172×320, IPS, 262K colors)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><b>Display Controller</b>   </td><td class="markdownTableBodyLeft">Sitronix ST7789V3    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><b>Communication</b>   </td><td class="markdownTableBodyLeft">SPI (Master, TX-only, 8-bit, CPOL=0/CPHA=0) + SPI DMA (GPDMA1 Ch7)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><b>Toolchain</b>   </td><td class="markdownTableBodyLeft">CMake, GCC ARM None EABI   </td></tr>
+</table>
+<h3><a class="anchor" id="autotoc_md16"></a>
+Wiring</h3>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadCenter">LCD Pin   </th><th class="markdownTableHeadCenter">STM32 Pin   </th><th class="markdownTableHeadCenter">Function    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">VCC   </td><td class="markdownTableBodyCenter">3.3V   </td><td class="markdownTableBodyCenter">Power    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">GND   </td><td class="markdownTableBodyCenter">GND   </td><td class="markdownTableBodyCenter">Ground    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">DIN (MOSI)   </td><td class="markdownTableBodyCenter">PA7 (SPI1_MOSI)   </td><td class="markdownTableBodyCenter">SPI Data    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">CLK (SCK)   </td><td class="markdownTableBodyCenter">PA5 (SPI1_SCK)   </td><td class="markdownTableBodyCenter">SPI Clock    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">CS   </td><td class="markdownTableBodyCenter">PB5   </td><td class="markdownTableBodyCenter">Chip Select (software-managed)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">DC   </td><td class="markdownTableBodyCenter">PB4   </td><td class="markdownTableBodyCenter">Data/Command select    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">RST   </td><td class="markdownTableBodyCenter">PC8   </td><td class="markdownTableBodyCenter">Hardware reset    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">BL   </td><td class="markdownTableBodyCenter">-   </td><td class="markdownTableBodyCenter">Backlight (active by default)   </td></tr>
+</table>
+<h3><a class="anchor" id="autotoc_md17"></a>
+Build &amp; Flash</h3>
+<div class="fragment"><div class="line"># Configure</div>
+<div class="line">cmake --preset Debug</div>
+<div class="line"> </div>
+<div class="line"># Build</div>
+<div class="line">cmake --build build/Debug</div>
+<div class="line"> </div>
+<div class="line"># Flash with your preferred tool (e.g. STM32CubeProgrammer, OpenOCD)</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md18"></a>
+Usage Example</h3>
+<div class="fragment"><div class="line"><span class="comment">/* Wire platform I/O into the driver */</span></div>
+<div class="line"><a class="code hl_struct" href="struct_s_t7789_v3___config.html">ST7789V3_Config</a> config = {</div>
+<div class="line">    .<a class="code hl_variable" href="struct_s_t7789_v3___config.html#afea37bc911203e6ea57e8a7a4d280579">spi_write</a>     = spi_write,</div>
+<div class="line">    .spi_write_dma = spi_write_dma,</div>
+<div class="line">    .delay_ms      = HAL_Delay,</div>
+<div class="line">    .set_cs        = set_cs,</div>
+<div class="line">    .set_dc        = set_dc,</div>
+<div class="line">    .set_rst       = set_rst,</div>
+<div class="line">    .LCD_Width     = 172,</div>
+<div class="line">    .LCD_Height    = 320,</div>
+<div class="line">    .State         = <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#ggaf6492eef7dd1a76b4a87bbb0bc7a1c54acc25853de420fdbb38c59ca0e19640d8">ST7789_STATE_READY</a>,</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Initialize display (reset + wake + color mode + offsets) */</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#ga39071f3db023e2d0833953a9231f4656">ST7789V3_init</a>(&amp;config);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Fill screen orange */</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#ga2a4ea66996106dad16e76709733f4ed9">FillScreen</a>(&amp;config, 0xFF6A00);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Rotate to landscape */</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#ga91f91f9fe718558d3ccb2ca227dd00e3">SetRotation</a>(&amp;config, <a class="code hl_enumvalue" href="group___s_t7789_v3___driver.html#gga871118a09520247c78a71ecd7b0abd58ae7083172018622dcf04df9a5989b10f4">Landscape</a>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Draw some shapes */</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#gaa73ad81f2c3d00bc690347304a088bd0">DrawFilledRectangle</a>(&amp;config, 50, 50, 100, 100, <a class="code hl_define" href="group___s_t7789_v3___driver.html#gacfbc006ea433ad708fdee3e82996e721">GREEN</a>);</div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#gae477d737e160c5868cbc6540c20316cd">DrawCircle</a>(&amp;config, 86, 160, 50, <a class="code hl_define" href="group___s_t7789_v3___driver.html#ga87b537f5fa5c109d3c05c13d6b18f382">WHITE</a>);</div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#gafda0e16fb96677dd567b79532e39b471">DrawFilledCircle</a>(&amp;config, 86, 160, 25, <a class="code hl_define" href="group___s_t7789_v3___driver.html#ga8d23feea868a983c8c2b661e1e16972f">RED</a>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* Render text with auto-wrap */</span></div>
+<div class="line"><a class="code hl_function" href="group___s_t7789_v3___driver.html#ga69740737d1ecb09b8d706d7d4ac84f6e">DrawString</a>(&amp;config, 20, 20, <span class="stringliteral">&quot;Hello World\nST7789V3 Driver&quot;</span>, <a class="code hl_define" href="group___s_t7789_v3___driver.html#gad243f93c16bc4c1d3e0a13b84421d760">CYAN</a>, &amp;Font_16x16);</div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga2a4ea66996106dad16e76709733f4ed9"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga2a4ea66996106dad16e76709733f4ed9">FillScreen</a></div><div class="ttdeci">void FillScreen(ST7789V3_Config *config, uint32_t hexcolor)</div><div class="ttdoc">Fill the entire LCD with a single RGB565 color. e.g take orange convert it to 5 bit 6 bit 5 bit TODO:...</div><div class="ttdef"><b>Definition</b> ST7789V3.c:228</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga39071f3db023e2d0833953a9231f4656"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga39071f3db023e2d0833953a9231f4656">ST7789V3_init</a></div><div class="ttdeci">void ST7789V3_init(ST7789V3_Config *config)</div><div class="ttdoc">Initialize the display and apply the default startup sequence.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:32</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga69740737d1ecb09b8d706d7d4ac84f6e"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga69740737d1ecb09b8d706d7d4ac84f6e">DrawString</a></div><div class="ttdeci">void DrawString(ST7789V3_Config *config, uint16_t x, uint16_t y, const char *str, uint32_t hexcolor, const FontDef *font)</div><div class="ttdoc">Draw a null-terminated string.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:340</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga87b537f5fa5c109d3c05c13d6b18f382"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga87b537f5fa5c109d3c05c13d6b18f382">WHITE</a></div><div class="ttdeci">#define WHITE</div><div class="ttdef"><b>Definition</b> ST7789V3.h:80</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga8d23feea868a983c8c2b661e1e16972f"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga8d23feea868a983c8c2b661e1e16972f">RED</a></div><div class="ttdeci">#define RED</div><div class="ttdef"><b>Definition</b> ST7789V3.h:81</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_ga91f91f9fe718558d3ccb2ca227dd00e3"><div class="ttname"><a href="group___s_t7789_v3___driver.html#ga91f91f9fe718558d3ccb2ca227dd00e3">SetRotation</a></div><div class="ttdeci">void SetRotation(ST7789V3_Config *config, Orientation orientation)</div><div class="ttdoc">Change the logical display rotation.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:295</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gaa73ad81f2c3d00bc690347304a088bd0"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gaa73ad81f2c3d00bc690347304a088bd0">DrawFilledRectangle</a></div><div class="ttdeci">void DrawFilledRectangle(ST7789V3_Config *config, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t hexcolor)</div><div class="ttdoc">Draw a filled rectangle.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:458</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gacfbc006ea433ad708fdee3e82996e721"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gacfbc006ea433ad708fdee3e82996e721">GREEN</a></div><div class="ttdeci">#define GREEN</div><div class="ttdef"><b>Definition</b> ST7789V3.h:82</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gad243f93c16bc4c1d3e0a13b84421d760"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gad243f93c16bc4c1d3e0a13b84421d760">CYAN</a></div><div class="ttdeci">#define CYAN</div><div class="ttdef"><b>Definition</b> ST7789V3.h:85</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gae477d737e160c5868cbc6540c20316cd"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gae477d737e160c5868cbc6540c20316cd">DrawCircle</a></div><div class="ttdeci">void DrawCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center, uint16_t radius, uint32_t hexcolor)</div><div class="ttdoc">Draw a circle outline using the midpoint circle algorithm.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:476</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gafda0e16fb96677dd567b79532e39b471"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gafda0e16fb96677dd567b79532e39b471">DrawFilledCircle</a></div><div class="ttdeci">void DrawFilledCircle(ST7789V3_Config *config, uint16_t x_center, uint16_t y_center, uint16_t radius, uint32_t hexcolor)</div><div class="ttdoc">Draw a filled circle using the midpoint circle algorithm.</div><div class="ttdef"><b>Definition</b> ST7789V3.c:505</div></div>
+<div class="ttc" id="agroup___s_t7789_v3___driver_html_gga871118a09520247c78a71ecd7b0abd58ae7083172018622dcf04df9a5989b10f4"><div class="ttname"><a href="group___s_t7789_v3___driver.html#gga871118a09520247c78a71ecd7b0abd58ae7083172018622dcf04df9a5989b10f4">Landscape</a></div><div class="ttdeci">@ Landscape</div><div class="ttdef"><b>Definition</b> ST7789V3.h:156</div></div>
+</div><!-- fragment --><hr  />
+<h2><a class="anchor" id="autotoc_md20"></a>
+References</h2>
+<ul>
+<li><a href="https://files.waveshare.com/upload/c/c1/ST7789V3_V0.1.pdf">ST7789V3 Datasheet</a></li>
+<li><a href="https://www.st.com/resource/en/user_manual/um3121-stm32h5-nucleo64-board-mb1814-stmicroelectronics.pdf">STM32H503RB Nucleo-64 User Manual</a></li>
+<li><a href="https://www.waveshare.com/wiki/1.47inch_LCD_Module">Waveshare 1.47″ LCD Module Wiki</a></li>
+</ul>
+<hr  />
+<p><b>Driver Source:</b> <a href="ST7789V3_Driver/ST7789V3.c"><code>ST7789V3.c</code></a> | <a href="ST7789V3_Driver/ST7789V3.h"><code>ST7789V3.h</code></a> | <b>Application:</b> <a href="Core/Src/main.c"><code>main.c</code></a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

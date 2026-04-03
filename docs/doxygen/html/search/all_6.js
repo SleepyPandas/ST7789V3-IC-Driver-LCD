@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['hardreset_0',['HardReset',['../group___s_t7789_v3___driver.html#gaaa123e897724bbf081998a2fee724d8b',1,'HardReset(ST7789V3_Config *config):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#gaaa123e897724bbf081998a2fee724d8b',1,'HardReset(ST7789V3_Config *config):&#160;ST7789V3.c']]],
-  ['height_1',['height',['../struct_font_def.html#af057609b2a4f68dab3b0068c377e2738',1,'FontDef']]],
-  ['high_2',['HIGH',['../group___s_t7789_v3___driver.html#gga5287eae6192c8db4b7b8b2d217419aa1a0c3a1dacf94061154b3ee354359c5893',1,'ST7789V3.h']]]
+  ['abstraction_20layer_0',['1. HAL Abstraction Layer',['../md__r_e_a_d_m_e.html#autotoc_md8',1,'']]],
+  ['addressing_20caset_20raset_20ramwr_1',['4. Window Addressing (CASET / RASET / RAMWR)',['../md__r_e_a_d_m_e.html#autotoc_md11',1,'']]],
+  ['api_20documentation_2',['ST7789V3 Driver API Documentation',['../index.html',1,'']]],
+  ['asleep_3',['Asleep',['../group___s_t7789_v3___driver.html#gga2427fef3681001bf19d097c7001a51e4ad5e59ad520c16796739d9f2d684cb303',1,'ST7789V3.h']]],
+  ['awake_4',['Awake',['../group___s_t7789_v3___driver.html#gga2427fef3681001bf19d097c7001a51e4add0eec7c1e2a236a30a2fb3d17f03c69',1,'ST7789V3.h']]]
 ];

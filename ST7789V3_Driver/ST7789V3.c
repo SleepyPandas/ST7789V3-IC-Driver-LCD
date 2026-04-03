@@ -188,7 +188,9 @@ static uint16_t ConvertRGB888toRGB565(uint32_t hexcolor) {
   return color565;
 }
 
-// Private Helper to build 64 pixel chunks to reduce SPI calls
+/**
+ * @brief Number of pixels written per buffered chunk during full-screen fills.
+ */
 #define FILLSCREEN_CHUNK_PIXELS 64U
 
 

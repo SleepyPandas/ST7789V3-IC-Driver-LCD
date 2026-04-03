@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['pink_0',['PINK',['../group___s_t7789_v3___driver.html#gada419fe3b48fcf19daed7cc57ccf1174',1,'ST7789V3.h']]],
-  ['portrait_1',['Portrait',['../group___s_t7789_v3___driver.html#gga871118a09520247c78a71ecd7b0abd58a99876b062ded0d7192d6f8576b9104b1',1,'ST7789V3.h']]],
-  ['portrait_5finverted_2',['Portrait_Inverted',['../group___s_t7789_v3___driver.html#gga871118a09520247c78a71ecd7b0abd58ae4c41457f1b63b69104bdd3ae7132a8a',1,'ST7789V3.h']]],
-  ['purple_3',['PURPLE',['../group___s_t7789_v3___driver.html#ga0bb0b009e7a7390473ace4d98bd843c0',1,'ST7789V3.h']]]
+  ['gold_0',['GOLD',['../group___s_t7789_v3___driver.html#gaf468028083c9e52aa2c94ef3b9940450',1,'ST7789V3.h']]],
+  ['gpio_5fpinstate_1',['GPIO_Pinstate',['../group___s_t7789_v3___driver.html#ga5287eae6192c8db4b7b8b2d217419aa1',1,'ST7789V3.h']]],
+  ['graphics_20engine_2',['5. Graphics Engine',['../md__r_e_a_d_m_e.html#autotoc_md12',1,'']]],
+  ['gray_3',['GRAY',['../group___s_t7789_v3___driver.html#gae5f70677050eecd8909e0248e07b9e73',1,'ST7789V3.h']]],
+  ['green_4',['GREEN',['../group___s_t7789_v3___driver.html#gacfbc006ea433ad708fdee3e82996e721',1,'ST7789V3.h']]]
 ];

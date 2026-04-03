@@ -1,9 +1,12 @@
 var searchData=
 [
-  ['inversion_5fmode_0',['Inversion_Mode',['../struct_s_t7789_v3___config.html#ab4848370db99890206ac8e9a65c4b349',1,'ST7789V3_Config::Inversion_Mode'],['../group___s_t7789_v3___driver.html#ga8b148ca1cdfef947b5cc803caf446348',1,'Inversion_Mode:&#160;ST7789V3.h']]],
-  ['invertdisplay_1',['InvertDisplay',['../group___s_t7789_v3___driver.html#ga1c794d77143a055e4e4c39913d6c65ad',1,'InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion):&#160;ST7789V3.c'],['../group___s_t7789_v3___driver.html#ga1c794d77143a055e4e4c39913d6c65ad',1,'InvertDisplay(ST7789V3_Config *config, Inversion_Mode Inversion):&#160;ST7789V3.c']]],
-  ['invoff_2',['INVOFF',['../group___s_t7789_v3___driver.html#gga8b148ca1cdfef947b5cc803caf446348ab5461e0e30c67eba3fc34ac2f4855205',1,'ST7789V3.h']]],
-  ['invoff_5freg_3',['INVOFF_REG',['../group___s_t7789_v3___driver.html#ga0029dfa6227106ea9cf546d9d4dd3c61',1,'ST7789V3.h']]],
-  ['invon_4',['INVON',['../group___s_t7789_v3___driver.html#gga8b148ca1cdfef947b5cc803caf446348aa47cfe71ccc5856874b048a1f661e91b',1,'ST7789V3.h']]],
-  ['invon_5freg_5',['INVON_REG',['../group___s_t7789_v3___driver.html#gab9501365e0bab79145f4539ae30cfe95',1,'ST7789V3.h']]]
+  ['bit_5f12_0',['bit_12',['../group___s_t7789_v3___driver.html#ggae18d0e1f599e550c0e6423437382f222a6378a61e5e5aa41679982570c0d27ac8',1,'ST7789V3.h']]],
+  ['bit_5f16_1',['bit_16',['../group___s_t7789_v3___driver.html#ggae18d0e1f599e550c0e6423437382f222a5a13625ddba54b5ba114f90d2b6b38eb',1,'ST7789V3.h']]],
+  ['bit_5f18_2',['bit_18',['../group___s_t7789_v3___driver.html#ggae18d0e1f599e550c0e6423437382f222af4a5e4862a34fbc696567e923d7b0010',1,'ST7789V3.h']]],
+  ['bit_5fdepth_3',['Bit_Depth',['../struct_s_t7789_v3___config.html#aa1da79728e9b2e10bbca6a19af64c23d',1,'ST7789V3_Config']]],
+  ['black_4',['BLACK',['../group___s_t7789_v3___driver.html#ga7b3b25cba33b07c303f3060fe41887f6',1,'ST7789V3.h']]],
+  ['blocking_20dma_5',['6. Non-Blocking DMA',['../md__r_e_a_d_m_e.html#autotoc_md13',1,'']]],
+  ['blue_6',['BLUE',['../group___s_t7789_v3___driver.html#ga79d10e672abb49ad63eeaa8aaef57c38',1,'ST7789V3.h']]],
+  ['build_20flash_7',['Build &amp; Flash',['../md__r_e_a_d_m_e.html#autotoc_md17',1,'']]],
+  ['bytes_5fper_5frow_8',['bytes_per_row',['../struct_font_def.html#ad973ca2889bf50f6ba14a02d631ac1d5',1,'FontDef']]]
 ];
