@@ -1,5 +1,4 @@
 
-https://github.com/user-attachments/assets/8278fadc-7736-462e-bd44-27f5153d0f41
 ![Language](https://img.shields.io/badge/Language-C-white) ![Architecture](https://img.shields.io/badge/Architecture-Bare_Metal-blue) ![Platform](https://img.shields.io/badge/Platform-STM32_ArmCortex_M33-42f5da) ![Display-IC](https://img.shields.io/badge/Display_Driver_IC-ST7789V3-a442f5) ![I/O](https://img.shields.io/badge/I%2FO-SPI_DMA-f7b80a) ![Build](https://img.shields.io/badge/Build-CMake-e81526)
 
 A from-scratch, register-level display driver for the ST7789V3 1.47″ LCD (172×320), running on an STM32H503RB (Arm Cortex-M33) with no external graphics libraries. Features a platform-agnostic architecture, non-blocking DMA transfers, a full 2D graphics engine (lines, circles, rectangles, text), RGB888->RGB565 color conversion, and 10 built-in bitmap fonts.
