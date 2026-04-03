@@ -1,6 +1,6 @@
 ﻿/**
   ******************************************************************************
-  * @file    Font8.c
+  * @file    font_8x8.c
   * @author  MCD Application Team
   * @version V1.0.0
   * @date    18-February-2014
