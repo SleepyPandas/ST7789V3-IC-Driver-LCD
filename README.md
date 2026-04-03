@@ -3,8 +3,8 @@
 
 A from-scratch, register-level display driver for the ST7789V3 1.47″ LCD (172×320), running on an STM32H503RB (Arm Cortex-M33) with no external graphics libraries. Features a platform-agnostic architecture, non-blocking DMA transfers, a full 2D graphics engine (lines, circles, rectangles, text), RGB888->RGB565 color conversion, and 10 built-in bitmap fonts.
 
-# Please see Documentation Here 
-## [Documentation](https://sleepypandas.github.io/ST7789V3-IC-Driver-LCD/)
+### Please see Documentation Here 
+#### [Documentation](https://sleepypandas.github.io/ST7789V3-IC-Driver-LCD/)
 
 
 ## Short Demo 
