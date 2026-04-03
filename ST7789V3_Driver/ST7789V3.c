@@ -128,34 +128,40 @@ int8_t SetWindow(ST7789V3_Config *config, uint16_t X_Start, uint16_t X_End,
   uint16_t Y_StartOffset = Y_Start + config->Row_Offset;
   uint16_t Y_EndOffset = Y_End + config->Row_Offset;
 
-  uint8_t High_Temp = (X_StartOffset >> 8);
-  uint8_t Low_Temp = (X_StartOffset & 0xFFU);
-  // Horizontal X , write the start write the end of X
-  WriteCommand(config, CASET);
+  uint8_t Column_Data[4] = {
+    (uint8_t)(X_StartOffset >> 8), 
+    (uint8_t)(X_StartOffset & 0xFFU),
+    (uint8_t)(X_EndOffset >> 8),   
+    (uint8_t)(X_EndOffset & 0xFFU)
+  };
 
-  WriteData(config, High_Temp);
-  WriteData(config, Low_Temp);
-  High_Temp = (X_EndOffset >> 8);
-  Low_Temp = (X_EndOffset & 0xFFU);
+  uint8_t Row_Data[4] = {
+    (uint8_t)(Y_StartOffset >> 8),             
+    (uint8_t)(Y_StartOffset & 0xFFU),            
+    (uint8_t)(Y_EndOffset >> 8),           
+    (uint8_t)(Y_EndOffset & 0xFFU)
+  };
+  
+  uint8_t Column_Command = CASET;
+  uint8_t Row_Command = RASET;
+  uint8_t Memory_Write_Command = RAMWR;
 
-  WriteData(config, High_Temp);
-  WriteData(config, Low_Temp);
+  // Keep CS low for the full window setup and send the address bytes in blocks.
+  config->set_cs(LOW);
 
-  WriteCommand(config, RASET);
+  config->set_dc(CMD);
+  config->spi_write(1, &Column_Command);
+  config->set_dc(DATA);
+  config->spi_write(sizeof(Column_Data), Column_Data);
 
-  High_Temp = (Y_StartOffset >> 8);
-  Low_Temp = (Y_StartOffset & 0xFFU);
+  config->set_dc(CMD);
+  config->spi_write(1, &Row_Command);
+  config->set_dc(DATA);
+  config->spi_write(sizeof(Row_Data), Row_Data);
 
-  WriteData(config, High_Temp);
-  WriteData(config, Low_Temp);
-
-  High_Temp = (Y_EndOffset >> 8);
-  Low_Temp = (Y_EndOffset & 0xFFU);
-
-  WriteData(config, High_Temp);
-  WriteData(config, Low_Temp);
-
-  WriteCommand(config, RAMWR);
+  config->set_dc(CMD);
+  config->spi_write(1, &Memory_Write_Command);
+  config->set_cs(HIGH);
   // Error code for wrong bounds? or exceeded bounds?
   return 0;
 }
