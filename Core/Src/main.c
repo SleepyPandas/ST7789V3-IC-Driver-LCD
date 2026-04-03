@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+
 #include "ST7789V3.h"
 #include "fonts/fonts.h"
 
@@ -33,6 +35,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DEMO_BG 0x040B12U
+#define DEMO_TITLE_BG 0x0B1523U
+#define DEMO_PANEL_BG 0x091624U
+#define DEMO_EDGE 0x1D5168U
+#define DEMO_TEXT 0xD4F3FFU
+#define DEMO_ACCENT 0x3CEBFFU
+#define DEMO_SOFT 0x177C93U
+#define DEMO_GOLD 0xFFD166U
+#define DEMO_WARN 0xFF6B3DU
 
 /* USER CODE END PD */
 
@@ -118,6 +129,71 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
 //   HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, state);
 // }
 
+static uint8_t DemoTriangle8(uint16_t phase) {
+  phase &= 0x01FFU;
+  return (phase < 256U) ? (uint8_t)phase : (uint8_t)(511U - phase);
+}
+
+static uint16_t DemoWaveRange(uint16_t phase, uint16_t min, uint16_t max) {
+  uint16_t span = max - min;
+  return min + (((uint32_t)DemoTriangle8(phase) * span) / 255U);
+}
+
+static void DemoDrawStaticScene(void) {
+  FillScreen(&config, DEMO_BG);
+
+  DrawFilledRectangle(&config, 0, 0, 320, 22, DEMO_TITLE_BG);
+  DrawLine(&config, 0, 22, 319, 22, DEMO_EDGE);
+
+  DrawString(&config, 10, 3, "ST7789V3", DEMO_ACCENT, &Font_16x16);
+  DrawString(&config, 154, 7, "COUNT", DEMO_TEXT, &Font_8x8);
+
+  DrawRectangle(&config, 55, 28, 210, 96, DEMO_EDGE);
+  DrawLine(&config, 55, 46, 264, 46, DEMO_EDGE);
+  DrawString(&config, 116, 33, "RECORDING IN", DEMO_GOLD, &Font_8x8);
+
+  DrawRectangle(&config, 39, 150, 242, 14, DEMO_EDGE);
+  DrawString(&config, 12, 154, "LOOP", DEMO_TEXT, &Font_8x8);
+  DrawString(&config, 286, 154, "GO", DEMO_TEXT, &Font_8x8);
+}
+
+static void DemoDrawCountdownFrame(uint32_t elapsed_ms) {
+  char text[24];
+  uint32_t cycle_ms = 11000U;
+  uint32_t phase_ms = elapsed_ms % cycle_ms;
+  uint16_t remaining = (uint16_t)(10U - (phase_ms / 1000U));
+  uint16_t ring = DemoWaveRange((uint16_t)(remaining * 41U), 18U, 34U);
+  uint16_t progress = (uint16_t)(((cycle_ms - phase_ms) * 236U) / cycle_ms);
+  uint16_t number_width = (remaining >= 10U) ? 96U : 48U;
+  uint16_t number_x = (uint16_t)(160U - (number_width / 2U));
+  uint32_t accent = (remaining <= 3U) ? DEMO_WARN : DEMO_ACCENT;
+
+  DrawFilledRectangle(&config, 58, 49, 204, 72, DEMO_PANEL_BG);
+  DrawCircle(&config, 160, 85, 36, DEMO_SOFT);
+  DrawCircle(&config, 160, 85, ring, accent);
+  DrawFilledCircle(&config, 160, 85, 8, accent);
+
+  snprintf(text, sizeof(text), "%u", (unsigned int)remaining);
+  DrawString(&config, number_x, 60, text, DEMO_TEXT, &Font_48x48);
+
+  DrawFilledRectangle(&config, 20, 126, 280, 14, DEMO_BG);
+  snprintf(text, sizeof(text), "NEXT LOOP IN %u SEC",
+           (unsigned int)remaining);
+  DrawString(&config, 89, 128, text, accent, &Font_8x8);
+
+  DrawFilledRectangle(&config, 42, 153, 236, 8, DEMO_PANEL_BG);
+  if (progress > 0U) {
+    DrawFilledRectangle(&config, 42, 153, progress, 8, accent);
+  }
+
+  DrawFilledRectangle(&config, 214, 4, 96, 14, DEMO_TITLE_BG);
+  if ((remaining == 0U) && (((phase_ms / 150U) & 1U) != 0U)) {
+    DrawString(&config, 226, 6, "CAPTURE", DEMO_WARN, &Font_8x8);
+  } else {
+    DrawString(&config, 232, 6, "READY", DEMO_GOLD, &Font_8x8);
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -166,45 +242,25 @@ int main(void)
   MX_ICACHE_Init();
   /* USER CODE BEGIN 2 */
   ST7789V3_init(&config);
-
   InvertDisplay(&config, INVOFF);
-
-  FillScreen(&config, 0xff9900);
-
-  InvertDisplay(&config, INVON);
-
-  // for (uint16_t i = 40; i < 86; i++) {
-  //   DrawPixel(&config, i, 160, COLOR_LIME);
-  // }
-
-  DrawPixel(&config, 86, 160, GRAY);
-
   SetRotation(&config, Landscape);
-
-  DrawChar(&config, 50, 70, 'C', CYAN, &Font_16x16);
-  DrawChar(&config, 50, 20, '5', CYAN, &Font_24x32);
-  DrawChar(&config, 50, 180, '9', CYAN, &Font_48x48);
-
-  DrawString(&config, 50, 100, "Hello World\nThis is a test", CYAN,
-             &Font_16x16);
-
-  DrawLine(&config, 50, 50, 100, 100, WHITE);
-
-  DrawString(&config, 20, 50, "CAR\rTomato", BLACK,
-             &Font_16x16);
-
-  DrawRectangle(&config, 50, 25, 50, 50, WHITE);
-
-  DrawFilledRectangle(&config, 50, 50, 100, 100, GREEN);
-
-  DrawCircle(&config, 86, 160, 50, WHITE);
-  DrawFilledCircle(&config, 86, 160, 25, RED);
+  DemoDrawStaticScene();
+  DemoDrawCountdownFrame(0U);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+    static uint32_t last_second = 0xFFFFFFFFU;
+    uint32_t elapsed_ms = HAL_GetTick();
+    uint32_t current_second = elapsed_ms / 1000U;
+
+    if (current_second != last_second) {
+      DemoDrawCountdownFrame(elapsed_ms);
+      last_second = current_second;
+    }
+    HAL_Delay(20);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
