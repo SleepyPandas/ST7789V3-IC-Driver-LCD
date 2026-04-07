@@ -19,14 +19,14 @@ HIDE_UNDOC_CLASSES     = YES
 HIDE_FRIEND_COMPOUNDS  = YES
 HIDE_IN_BODY_DOCS      = YES
 
-INPUT                  = docs/index.md README.md ST7789V3_Driver
+INPUT                  = docs/quick-start.md docs/index.md README.md ST7789V3_Driver
 FILE_PATTERNS          = *.h *.c *.md
 RECURSIVE              = YES
 EXCLUDE                = build Core Drivers cmake .tmp_mpu6500_docs .tmp_mpu6500_source
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = */build/* */Core/* */Drivers/* */cmake/* */__pycache__/* */.tmp_mpu6500_docs/* */.tmp_mpu6500_source/*
 
-USE_MDFILE_AS_MAINPAGE = docs/index.md
+USE_MDFILE_AS_MAINPAGE = docs/quick-start.md
 MARKDOWN_SUPPORT       = YES
 AUTOLINK_SUPPORT       = YES
 
