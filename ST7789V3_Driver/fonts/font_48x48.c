@@ -4665,3 +4665,7 @@ const FontDef Font_48x48 = {
     .height = 48,
     .bytes_per_row = 6
 };
+/**
+ * @file font_48x48.c
+ * @brief Bitmap glyph data for the built-in Font_48x48 font.
+ */

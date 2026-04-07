@@ -2385,3 +2385,7 @@ const FontDef Font_16x24 = {
     .height = 24,
     .bytes_per_row = 2
 };
+/**
+ * @file font_16x24.c
+ * @brief Bitmap glyph data for the built-in Font_16x24 font.
+ */

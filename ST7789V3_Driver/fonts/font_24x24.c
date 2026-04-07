@@ -2385,3 +2385,7 @@ const FontDef Font_24x24 = {
     .height = 24,
     .bytes_per_row = 3
 };
+/**
+ * @file font_24x24.c
+ * @brief Bitmap glyph data for the built-in Font_24x24 font.
+ */

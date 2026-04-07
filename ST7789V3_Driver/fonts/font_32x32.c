@@ -3145,3 +3145,7 @@ const FontDef Font_32x32 = {
     .height = 32,
     .bytes_per_row = 4
 };
+/**
+ * @file font_32x32.c
+ * @brief Bitmap glyph data for the built-in Font_32x32 font.
+ */

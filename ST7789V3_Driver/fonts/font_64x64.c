@@ -6185,3 +6185,7 @@ const FontDef Font_64x64 = {
     .height = 64,
     .bytes_per_row = 8
 };
+/**
+ * @file font_64x64.c
+ * @brief Bitmap glyph data for the built-in Font_64x64 font.
+ */

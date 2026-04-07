@@ -1715,3 +1715,7 @@ const uint8_t Font16_Table[] =
 
 const FontDef Font_8x16 = { Font16_Table, 11, 16, 2 };
 
+/**
+ * @file font_8x16.c
+ * @brief Bitmap glyph data for the built-in Font_8x16 font.
+ */
