@@ -1,3 +1,9 @@
+html,
+body,
+#doc-content {
+    scroll-behavior: auto;
+}
+
 /**
  * GitHub Primer–inspired palette overrides for doxygen-awesome-css.
  * Loaded after theme CSS so these variables win.
