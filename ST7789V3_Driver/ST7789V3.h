@@ -113,7 +113,7 @@
 typedef enum {
   HIGH = 1, /**< Drive the output high. */
   LOW = 0, /**< Drive the output low. */
-} GPIO_Pinstate;
+} ST7789V3_PinState;
 
 /**
  * @brief Select whether the current SPI byte stream is command or pixel/data content.
@@ -121,7 +121,7 @@ typedef enum {
 typedef enum {
   DATA = 1, /**< Treat the transfer as display data. */
   CMD = 0, /**< Treat the transfer as a controller command. */
-} Trans_State;
+} ST7789V3_Trans_State;
 
 /**
  * @brief Pixel format written to the display controller.
@@ -202,10 +202,10 @@ struct ST7789V3_Config {
   int8_t (*spi_write_dma)(uint16_t len, const uint8_t *pData); /**< Optional DMA SPI write callback. Set to `NULL` to disable DMA support. */
   void (*delay_ms)(uint32_t milliseconds); /**< Millisecond delay callback used during reset and initialization sequencing. */
 
-  int8_t (*set_cs)(GPIO_Pinstate state); /**< Chip select control callback. */
-  int8_t (*set_dc)(Trans_State state); /**< Data/command select callback. */
-  int8_t (*set_rst)(GPIO_Pinstate state); /**< Hardware reset control callback. */
-  int8_t (*set_backlight)(GPIO_Pinstate state); /**< Optional backlight control callback. */
+  int8_t (*set_cs)(ST7789V3_PinState state); /**< Chip select control callback. */
+  int8_t (*set_dc)(ST7789V3_Trans_State state); /**< Data/command select callback. */
+  int8_t (*set_rst)(ST7789V3_PinState state); /**< Hardware reset control callback. */
+  int8_t (*set_backlight)(ST7789V3_PinState state); /**< Optional backlight control callback. */
 
   uint16_t LCD_Width; /**< Current logical display width in pixels. */
   uint16_t LCD_Height; /**< Current logical display height in pixels. */

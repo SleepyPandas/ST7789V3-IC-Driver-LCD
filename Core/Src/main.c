@@ -79,16 +79,16 @@ static void MX_ICACHE_Init(void);
 
 ST7789V3_Config config;
 
-int8_t set_cs(GPIO_Pinstate state) {
+int8_t set_cs(ST7789V3_PinState state) {
   HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, state);
   return 0;
 }
 
-int8_t set_dc(Trans_State state) {
+int8_t set_dc(ST7789V3_Trans_State state) {
   HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, state);
   return 0;
 }
-int8_t set_rst(GPIO_Pinstate state) {
+int8_t set_rst(ST7789V3_PinState state) {
   HAL_GPIO_WritePin(LCD_RES_GPIO_Port, LCD_RES_Pin, state);
   return 0;
 }
