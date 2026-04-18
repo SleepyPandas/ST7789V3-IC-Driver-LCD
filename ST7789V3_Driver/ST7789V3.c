@@ -30,13 +30,11 @@ static void WriteData(ST7789V3_Config *config, uint8_t data) {
 }
 
 void ST7789V3_init(ST7789V3_Config *config) {
-  //   1. Hardware RST pulse GPIO only, no SPI
-  //   2. Delay(~120ms after RST goes HIGH)
-  //   3. Now start SPI communication
-  //   4. SLPOUT(0x11) + delay
-  //    other stuff.... for initilization Perhaps Based on users config?
 
-  //
+
+  config->set_cs(HIGH);   // deselect display before reset/commands
+  config->set_dc(CMD);
+  
 
   config->set_rst(HIGH);
   config->delay_ms(10);
@@ -74,6 +72,8 @@ void ST7789V3_init(ST7789V3_Config *config) {
 
   // Set backlight on
   // config->set_backlight(HIGH);
+
+  config->set_cs(HIGH); 
 }
 
 int8_t SetColorMode(ST7789V3_Config *config, Color_Mode bitdepth) {
